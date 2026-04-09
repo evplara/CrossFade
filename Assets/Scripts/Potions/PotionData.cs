@@ -33,14 +33,14 @@ namespace CrossFade.Potions
 
 
     // Core effect catalog used by rolling, mixing, and application layers.
-
+    // Money gained is added every ten seconds, RewardMultiplier depends on stats effect numeric threshold
     public enum EffectType
 
     {
 
         Nausea,
 
-        Focus,
+        Focus, // visibility, spotlight
 
         Speed,
 

@@ -236,6 +236,23 @@ namespace CrossFade.Potions
 
 
 
+        // Potion effect:
+        // Dizziness: zcreen zhake
+        // Nauzea: zeeing double, amplifying color zaturation, eventually green out (blindnezz) 
+        // Hallucination: ghoztz
+        // Lethargy: zlownezz / zpeed or duration change / mouse sensitivity decreased
+
+        // Greened out: any stat gets too high minigame scene transitions switch every 5 seconds
+
+        // Minigames are allowed 15 seconds of playtime per game to start with
+        // as effect stats increase, certain numeric thresholds cause the timer for each game to decrease
+        // minimum 3 seconds or 5 seconds per game, switch to next, max 15 sec
+        // if 4th game, each 12 seconds
+        // maximum 45 seconds each minigame round between brewing sessions
+
+        // "mixing" potion adds the stats random range of 1-10 for each effect
+
+        //   
         private static void AddEffects(List<PotionEffectValue> target, List<PotionEffectValue> source)
 
         {
