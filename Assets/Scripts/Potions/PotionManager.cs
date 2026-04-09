@@ -17,7 +17,7 @@ namespace CrossFade.Potions
         public int MaxSlots { get; private set; }
 
 
-        // Returns: ad-only snapshot of current inventory potions.
+        // Returns: Read-only snapshot of current inventory potions.
 
         public IReadOnlyList<PotionData> Inventory => _inventory;
 
@@ -32,7 +32,21 @@ namespace CrossFade.Potions
             // 1) Assign dependencies.
             // 2) Validate and store max slot count.
             // 3) Initialize collections as needed.
-            throw new NotImplementedException();
+            if (roller == null)
+            {
+                throw new ArgumentNullException(nameof(roller));
+            }
+            if (mixer == null)
+            {
+                throw new ArgumentNullException(nameof(mixer));
+            }
+            if (maxSlots <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maxSlots));
+            }
+            _roller = roller;
+            _mixer = mixer;
+            MaxSlots = maxSlots;
         }
 
 
@@ -43,7 +57,16 @@ namespace CrossFade.Potions
         {
             // 1) Validate incoming list is not null/empty.
             // 2) Replace manager template cache.
-            throw new NotImplementedException();
+            if (templates == null)
+            {
+                throw new ArgumentNullException(nameof(templates));
+            }
+            if (templates.Count == 0)
+            {
+                throw new ArgumentException("Templates cannot be empty.", nameof(templates));
+            }
+            _templates.Clear();
+            _templates.AddRange(templates);
         }
 
 
@@ -56,7 +79,13 @@ namespace CrossFade.Potions
             // 2) Request new potion from _roller.
             // 3) Add potion to _inventory.
             // 4) Return success/failure state.
-            throw new NotImplementedException();
+            if (!HasFreeSlot())
+            {
+                return false;
+            }
+            var potion = _roller.RollPotion(_templates);
+            _inventory.Add(potion);
+            return true;
         }
 
 
@@ -72,7 +101,26 @@ namespace CrossFade.Potions
             // 3) Call _mixer.Mix and handle failure.
             // 4) Remove source potions and store mixed output.
             // 5) Return success/failure.
-            throw new NotImplementedException();
+            if (leftIndex < 0 || leftIndex >= _inventory.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(leftIndex));
+            }
+            if (rightIndex < 0 || rightIndex >= _inventory.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(rightIndex));
+            }
+            if (leftIndex == rightIndex)
+            {
+                throw new ArgumentException("Indices must differ.");
+            }
+            var leftPotion = _inventory[leftIndex];
+            var rightPotion = _inventory[rightIndex];
+            var mixedPotion = _mixer.Mix(leftPotion, rightPotion);
+            var higherIndex = Math.Max(leftIndex, rightIndex);
+            var lowerIndex = Math.Min(leftIndex, rightIndex);
+            _inventory[lowerIndex] = mixedPotion;
+            _inventory.RemoveAt(higherIndex);
+            return true;
         }
 
 
@@ -86,7 +134,14 @@ namespace CrossFade.Potions
             // 2) Mark potion IsConsumed = true.
             // 3) Remove potion from inventory.
             // 4) Return consumed potion for external stat application.
-            throw new NotImplementedException();
+            if (index < 0 || index >= _inventory.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+            var potion = _inventory[index];
+            potion.IsConsumed = true;
+            _inventory.RemoveAt(index);
+            return potion;
         }
 
 
@@ -96,7 +151,7 @@ namespace CrossFade.Potions
         {
             // 1) Compare _inventory.Count against MaxSlots.
             // 2) Return whether at least one slot is available.
-            throw new NotImplementedException();
+            return _inventory.Count < MaxSlots;
         }
     }
 }
