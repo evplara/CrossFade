@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Multi-scene manager: 
+// Multi-scene manager:
 // Main Menu, Credits, Guide, Pause Menu, and Game Over
 // Potion Room
 // minigames include Interview, Cooking, and Car MiniGame
@@ -11,18 +11,33 @@ public class HandleSceneManager : MonoBehaviour
 
     private void Awake()
     {
-        if (instance == null)
+        if (instance != null && instance != this)
         {
-            instance = this;
+            Destroy(gameObject);
+            return;
         }
 
-        DontDestroyOnLoad(this);
+        instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
-    //maybe can switch to enums or specific value if needed
-    public void LoadScene(string targetScene)
+    private void OnDestroy()
     {
-        SceneManager.LoadSceneAsync(targetScene);
+        if (instance == this)
+        {
+            instance = null;
+        }
+    }
+
+    public void LoadScene(string sceneName)
+    {
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            Debug.LogWarning("HandleSceneManager.LoadScene: empty scene name.");
+            return;
+        }
+
+        SceneManager.LoadScene(sceneName);
     }
 
     public void QuitGame()

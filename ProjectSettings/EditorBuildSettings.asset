@@ -6,8 +6,29 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
+    path: Assets/Scenes/MainMenu.unity
+    guid: 3cdeae8fe7010bf4cb7e4a713d0fb7d3
+  - enabled: 1
+    path: Assets/Scenes/PotionRoom.unity
+    guid: 22113b14f19ec6a4e9789373889b716c
+  - enabled: 1
+    path: Assets/Scenes/Credits.unity
+    guid: efaadee0d2939d948b7f97e7fea8e453
+  - enabled: 1
+    path: Assets/Scenes/Guide.unity
+    guid: 3add74b37047a22428cc3bc23fd52dbc
+  - enabled: 1
+    path: Assets/Scenes/GameOverScreen.unity
+    guid: c984b556d9d4c7840b305e03f236cc27
+  - enabled: 1
+    path: Assets/Scenes/PauseMenu.unity
+    guid: 5d9b40746545937459baab982a0c9353
+  - enabled: 1
+    path: Assets/Scenes/PotionTesting.unity
+    guid: e6842619b5ec850409ab460031267ddb
+  - enabled: 1
+    path: Assets/Scenes/Interview/Interview.unity
+    guid: 7090a5ec3bacd6a48bc84feadc1fe177
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
