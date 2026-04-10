@@ -19,7 +19,6 @@ using UnityEngine;
  */
 
 namespace CrossFade.Potions
-
 {
     // Centralized mapping from potion effect intensity to minigame timing.
 

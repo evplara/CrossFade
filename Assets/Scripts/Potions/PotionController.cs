@@ -8,6 +8,8 @@ namespace CrossFade.Potions
     // Place on a scene object (e.g. potion room / brewing UI root). Teammates hook UI to InventoryChanged / SelectionChanged;
     // slot clicks call Select(index). Roll / mix buttons call TryRollAndStorePotion / TryMixByIndex.
     // TODO(teammate): Persist inventory across scenes via PlayerStatManager or a save system.
+    // Instance points at the first controller that awakens; additional components still work for UI wired to them,
+    // but each owns its own inventory — prefer a single PotionController per scene for production.
     public class PotionController : MonoBehaviour
     {
         public static PotionController Instance { get; private set; }
@@ -30,12 +32,16 @@ namespace CrossFade.Potions
 
         public event Action InventoryChanged;
         public event Action<int> SelectionChanged;
-        
+
         private void Awake()
         {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
 
             Instance = this;
-
             if (_maxSlots <= 0)
             {
                 _maxSlots = 8;
@@ -45,13 +51,12 @@ namespace CrossFade.Potions
             _mixer = new PotionMixer();
             _manager = new PotionManager(_roller, _mixer, _maxSlots);
             _cachedPotionBySlot = new PotionData[_maxSlots];
+
+            DontDestroyOnLoad(gameObject);
         }
 
-        
         public void OnRollButtonClicked()
         {
-
-
             if (!TryRollAndStorePotion())
             {
                 Debug.Log("Roll failed.");
