@@ -34,9 +34,9 @@ namespace CrossFade.Potions
 
         public const float MinimumSecondsPerGame = 5f;
 
-        public const float GreenedOutSecondsPerGame = 5f;
-
         public const float DefaultRoundTotalSeconds = 45f;
+
+        public const float GreenedOutSecondsPerGame = 3f;
 
         public const float GreenedOutRoundTotalSeconds = 30f;
 
