@@ -75,8 +75,6 @@ namespace CrossFade.Potions
 
         }
 
-
-
         private static float ResolveReductionFromIntensity(float maxEffect)
         {
             if (maxEffect >= 14f)
@@ -93,7 +91,7 @@ namespace CrossFade.Potions
             {
                 return 3f;
             }
-            
+
             return 0f;
         }
 
