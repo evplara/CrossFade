@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
+// Procedurally generate potion items with effect types and numeric values of range 1-10.random() 
+// Struct: High %, Dizziness %, Nausea %, Hallucination %, Lethargy %, Focus %
+// If enum of effects or High % passes max threshold, enable "greened out" - set timer 5 sec per minigame, switch next, 30 sec of playtime overall.
+// 
 
 
 namespace CrossFade.Potions
