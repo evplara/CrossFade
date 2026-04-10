@@ -1,29 +1,20 @@
 using UnityEngine;
 
 /*
- * PotionTiming.cs — Map potion stats to minigame timers (static helpers)
+ * PotionTiming.cs — Map PotionData stats to minigame timers (static helpers)
  *
- * What it does:
- *   Converts PotionData (especially IsGreenedOut / max effect strength) into per-minigame duration
- *   and total round time. Used by minigame flow code, not by inventory.
+ * What lives here:
+ *   - ResolveSecondsPerGame, ResolveRoundTotalSeconds from IsGreenedOut / GetMaxEffectValue.
+ *   - Tunable constants (default seconds, green-out shortcuts, minimum per game).
  *
- * Public API / usage:
- *   - ResolveSecondsPerGame(potion, gameIndex): green-out -> fixed short time; else reduce default time
- *     from max effect via ResolveReductionFromIntensity, clamp to minimum.
- *     (Fourth-minigame special case is commented out until a 4th minigame exists.)
- *   - ResolveRoundTotalSeconds(potion): green-out round cap vs default 45s.
- *   - Constants: tune in one place.
- *
- * Private:
- *   - ResolveReductionFromIntensity: tiered reduction from highest effect value.
+ * Main APIs / usage:
+ *   - Minigame flow calls these with the active consumed / round potion; not used by inventory code.
+ *   - ResolveReductionFromIntensity: private tiered reduction from highest effect value.
  */
 
 namespace CrossFade.Potions
 {
-    // Centralized mapping from potion effect intensity to minigame timing.
-
     public static class PotionTiming
-
     {
         public const float DefaultSecondsPerGame = 15f;
 
@@ -39,8 +30,8 @@ namespace CrossFade.Potions
 
         public const float GreenedOutRoundTotalSeconds = 30f;
 
-        // Returns per-minigame duration based on effect values and game slot index.
-        public static float ResolveSecondsPerGame(PotionData potion, int gameIndex)
+        // Returns per-minigame duration based on effect values. (Add a gameIndex overload when a 4th minigame needs a fixed duration.)
+        public static float ResolveSecondsPerGame(PotionData potion)
         {
             if (potion == null)
             {
@@ -51,12 +42,6 @@ namespace CrossFade.Potions
             {
                 return GreenedOutSecondsPerGame;
             }
-
-            // Fourth minigame (index 3): fixed 12s — enable when a 4th minigame ships.
-            // if (gameIndex == 3)
-            // {
-            //     return FourthGameSeconds;
-            // }
 
             var maxEffect = potion.GetMaxEffectValue();
             var reduction = ResolveReductionFromIntensity(maxEffect);
@@ -93,9 +78,6 @@ namespace CrossFade.Potions
 
             return 0f;
         }
-
     }
-
 }
-
 

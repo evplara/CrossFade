@@ -1,25 +1,20 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 /*
  * PotionRoller.cs — Procedural potion generation
  *
- * What it does:
- *   Picks a rarity via weighted random, then builds Name from Resources/PotionNaming.json
- *   (random affix + random suffix as "Affix Suffix"), and rolls every PotionRules.CoreEffects value 1–10.
+ * What lives here:
+ *   - Weighted rarity roll, then Name / Affix / Suffix from PotionNaming (Resources JSON).
+ *   - One rolled value per PotionRules.CoreEffects (range PotionRules.MinRollValue–MaxRollValue).
  *
  * Main APIs / usage:
- *   - RollPotion(): entry point from PotionManager.TryRollAndStorePotion (manager may discard oldest when full).
- *   - RollRarity: weighted wheel using internal _rarityWeights.
- *   - BuildRolledPotion: creates PotionData with all six effects rolled.
- *   - SetRarityWeights: runtime balance/testing override.
- *   - RollCoreEffectValue: private 1–10 roll helper.
+ *   - RollPotion / BuildRolledPotion: called from PotionController.TryRollAndStorePotion.
+ *   - SetRarityWeights: optional runtime tuning for testing or balance.
  */
 
 namespace CrossFade.Potions
 {
-    // Responsible for rarity rolls, naming, and effect value rolling.
     public class PotionRoller
     {
         private static readonly PotionRarity[] RarityOrder =
