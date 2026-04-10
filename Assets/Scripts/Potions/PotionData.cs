@@ -104,9 +104,7 @@ namespace CrossFade.Potions
     {
         public string InstanceId = Guid.NewGuid().ToString();
         public string Name = string.Empty;
-        /// <summary>First word of a rolled potion name; used when mixing (left affix + right suffix).</summary>
         public string Affix = string.Empty;
-        /// <summary>Second word of a rolled potion name; used when mixing.</summary>
         public string Suffix = string.Empty;
         public PotionRarity Rarity = PotionRarity.Common;
         public List<PotionEffectValue> Effects = new();

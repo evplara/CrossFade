@@ -70,8 +70,7 @@ namespace CrossFade.Potions
             return !ViolatesForbiddenRules(left, right);
         }
 
-        // Applies additive mix rules to merged effect values.
-        // New spec: values are directly added per effect type
+        // Applies additive mix rules to merged effect values (additive)
         public List<PotionEffectValue> ApplyMixRules(List<PotionEffectValue> mergedEffects)
         {
             if (mergedEffects == null || mergedEffects.Count == 0)
