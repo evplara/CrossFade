@@ -1,0 +1,26 @@
+{
+  "affixes": [
+    "Glimmering",
+    "Murky",
+    "Fizzy",
+    "Bitter",
+    "Sweet",
+    "Cracked",
+    "Ancient",
+    "Whispering",
+    "Restless",
+    "Drowsy"
+  ],
+  "suffixes": [
+    "Tonic",
+    "Elixir",
+    "Draught",
+    "Brew",
+    "Philter",
+    "Vial",
+    "Concoction",
+    "Mixture",
+    "Serum",
+    "Essence"
+  ]
+}

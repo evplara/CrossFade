@@ -1,6 +1,22 @@
 using System;
 using System.Collections.Generic;
 
+/*
+ * PotionManager.cs — Inventory orchestration for potions
+ *
+ * What it does:
+ *   Holds a list of PotionData, template list for rolling, and delegates generation to PotionRoller
+ *   and combination to PotionMixer.
+ *
+ * Members / usage:
+ *   - Constructor(PotionRoller, PotionMixer, maxSlots): wire dependencies and capacity.
+ *   - SetTemplates: load/replace PotionTemplate list before rolls (required for RollPotion).
+ *   - TryRollAndStorePotion: if slot free, calls _roller.RollPotion(_templates) and appends to inventory.
+ *   - TryMixByIndex: combines two slots via _mixer.Mix, replaces lower index, removes higher index.
+ *   - ConsumePotion: marks consumed, removes from inventory, returns PotionData for applying stats (see TODO hooks).
+ *   - HasFreeSlot / Inventory: capacity and read-only list for UI or game systems.
+ */
+
 namespace CrossFade.Potions
 {
     // Coordinates potion inventory flow: rolling, storing, mixing, and consuming.
@@ -51,8 +67,6 @@ namespace CrossFade.Potions
 
 
         // Loads template data used for future potion rolls.
-
-        // templates: Template set to keep in manager state.
         public void SetTemplates(List<PotionTemplate> templates)
         {
             // 1) Validate incoming list is not null/empty.
@@ -71,7 +85,6 @@ namespace CrossFade.Potions
 
 
         // Rolls a new potion and adds it to inventory if space exists.
-
         // Returns: True when potion is successfully added.
         public bool TryRollAndStorePotion()
         {
@@ -141,6 +154,8 @@ namespace CrossFade.Potions
             var potion = _inventory[index];
             potion.IsConsumed = true;
             _inventory.RemoveAt(index);
+            // TODO(teammate): Apply potion effect totals to shared PlayerStats and timer systems here.
+            // TODO(teammate): Money/health runtime systems should read those shared stats, not inventory state.
             return potion;
         }
 
