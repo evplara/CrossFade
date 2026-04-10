@@ -98,7 +98,7 @@ public class InterviewMiniGame : MonoBehaviour
 
         string[] words = input.Split(' ');
 
-        //for testing: more forgiving scale
+        //for testing
         float chance = Mathf.Pow(distortion, 0.5f);
 
         for (int i = 0; i < words.Length; i++)
