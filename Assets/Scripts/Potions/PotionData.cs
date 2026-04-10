@@ -13,7 +13,7 @@ using System.Collections.Generic;
  *     "Affix Suffix"; mixed names are "Affix + Suffix" from left/right parts (see PotionMixer).
  *
  * Main APIs / usage:
- *   - PotionRoller builds PotionData; PotionMixer merges two; PotionManager stores them.
+ *   - PotionRoller builds PotionData; PotionMixer merges two; PotionController holds inventory.
  *   - GetEffectValue / HasEffect: read one stat; GetMaxEffectValue / IsGreenedOut: minigame timing & VFX thresholds.
  *   - Tooltip or HUD: iterate Effects or use GetEffectValue per EffectType.
  */
@@ -46,7 +46,6 @@ namespace CrossFade.Potions
     {
         public const int MinRollValue = 1;
         public const int MaxRollValue = 10;
-        public const int MaxMixedValue = 20;
         public const int GreenOutThreshold = 16;
 
         public static readonly EffectType[] CoreEffects =
@@ -169,6 +168,26 @@ namespace CrossFade.Potions
             }
 
             return max;
+        }
+
+        // Space-separated "Type=value" in PotionRules.CoreEffects order (uses GetEffectValue — same numbers as gameplay).
+        public string FormatEffectsForDebug()
+        {
+            var types = PotionRules.CoreEffects;
+            var s = string.Empty;
+            for (var i = 0; i < types.Length; i++)
+            {
+                var t = types[i];
+                var v = GetEffectValue(t);
+                if (i > 0)
+                {
+                    s += " ";
+                }
+
+                s += $"{t}={v}";
+            }
+
+            return s;
         }
 
         public bool IsGreenedOut() =>

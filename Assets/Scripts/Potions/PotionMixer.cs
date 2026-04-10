@@ -2,24 +2,20 @@ using System;
 using System.Collections.Generic;
 
 /*
- * PotionMixer.cs — Combine two potions into one
+ * PotionMixer.cs — Combine two potions into one PotionData
  *
- * What it does:
- *   Merges effect lists from left + right, sums values per EffectType, outputs one PotionData
- *   with all core effect types present (missing types become 0).
+ * What lives here:
+ *   - Mix(left, right): validates inputs, merges effect lists, outputs normalized PotionData (all CoreEffects).
+ *   - CanMix, ApplyMixRules, ResolveMixedRarity; ViolatesForbiddenRules hook for future pair bans.
  *
  * Main APIs / usage:
- *   - Mix(left, right): validates inputs, merges, applies ApplyMixRules, picks max rarity; mixed Name is
- *     left.Affix + " + " + right.Suffix (fallback to full Name if parts missing).
- *   - CanMix: null/consumed guard + ViolatesForbiddenRules (currently always false - extend for forbidden pairs).
- *   - ApplyMixRules: aggregate duplicates then emit ordered list from PotionRules.CoreEffects.
- *   - ResolveMixedRarity: max of the two rarities.
- *   - Called from PotionManager.TryMixByIndex only.
+ *   - Mix: mixed Name is left.Affix + " + " + right.Suffix (fallback to Name parts if affix/suffix empty).
+ *   - ApplyMixRules: sums values per EffectType, emits one entry per PotionRules.CoreEffects order.
+ *   - Used only from PotionController.TryMixByIndex (not a MonoBehaviour).
  */
 
 namespace CrossFade.Potions
 {
-    // Handles potion combination rules: cancellation, amplification, and conflicts.
     public class PotionMixer
     {
         // Attempts to mix two potions into a new result potion instance.
@@ -93,10 +89,9 @@ namespace CrossFade.Potions
             }
 
             var result = new List<PotionEffectValue>(PotionRules.CoreEffects.Length);
-            var effectTypes = PotionRules.CoreEffects;
-            for (var i = 0; i < effectTypes.Length; i++)
+            for (var i = 0; i < PotionRules.CoreEffects.Length; i++)
             {
-                var effectType = effectTypes[i];
+                var effectType = PotionRules.CoreEffects[i];
                 aggregated.TryGetValue(effectType, out var baseValue);
                 result.Add(new PotionEffectValue(effectType, baseValue));
             }

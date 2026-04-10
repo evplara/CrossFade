@@ -1,7 +1,5 @@
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System;
 
 // Multi-scene manager: 
 // Main Menu, Credits, Guide, Pause Menu, and Game Over

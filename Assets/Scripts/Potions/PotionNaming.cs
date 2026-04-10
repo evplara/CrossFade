@@ -2,9 +2,19 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * PotionNaming.cs — Affix/suffix word lists for rolled potion names
+ *
+ * What lives here:
+ *   - PotionNamingData: JSON shape for Resources/PotionNaming.json (affixes + suffixes arrays).
+ *   - PotionNaming static helpers: LoadFromResources, PickRandomAffix / PickRandomSuffix.
+ *
+ * Main APIs / usage:
+ *   - PotionRoller calls into naming data when building display Name / Affix / Suffix on PotionData.
+ */
+
 namespace CrossFade.Potions
 {
-    // JSON shape for Resources/PotionNaming.json (affixes + suffixes word lists).
     [Serializable]
     public class PotionNamingData
     {
@@ -12,7 +22,6 @@ namespace CrossFade.Potions
         public string[] suffixes = Array.Empty<string>();
     }
 
-    // Loads naming data from Resources and picks random affix/suffix for rolled potions.
     public static class PotionNaming
     {
         private const string ResourcesName = "PotionNaming";

@@ -2,40 +2,61 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * PotionController.cs — Unity facade for potion brewing (inventory, lifecycle, mutations)
+ *
+ * What lives here:
+ *   - Singleton MonoBehaviour: inventory list, PotionRoller / PotionMixer, selected shelf index, slot cache, events.
+ *   - TryRollAndStorePotion, TryMixByIndex, ConsumePotionAt; selection shifts when inventory changes.
+ *   - Partial class: PotionInventory.cs (selection + GetAt / cache), PotionUI.cs (Inspector button hooks).
+ *
+ * Main APIs / usage:
+ *   - Instance, Inventory, HasFreeSlot, MaxSlots, Select, mutations above; subscribe to InventoryChanged / SelectionChanged.
+ *   - On consume, forwards effect totals to PlayerPotionStats when present.
+ */
+
 namespace CrossFade.Potions
 {
-    // Coordinates potion flow: rolling, mixing, consumption, and slot selection backed by PotionManager.
-    // Place on a scene object (e.g. potion room / brewing UI root). Teammates hook UI to InventoryChanged / SelectionChanged;
-    // slot clicks call Select(index). Roll / mix buttons call TryRollAndStorePotion / TryMixByIndex.
-    // TODO(teammate): Persist inventory across scenes via PlayerStatManager or a save system.
-    public class PotionController : MonoBehaviour
+    public partial class PotionController : MonoBehaviour
     {
         public static PotionController Instance { get; private set; }
 
         [SerializeField]
-        [Tooltip("Max shelf slots passed to PotionManager (must be > 0).")]
+        [Tooltip("Max shelf slots (must be > 0).")]
         private int _maxSlots = 8;
 
-        private PotionManager _manager;
+        private readonly List<PotionData> _inventory = new();
         private PotionRoller _roller;
         private PotionMixer _mixer;
 
-        // Currently selected inventory index, or -1 if none.
+        // Testing / no selection UI: OnMix pairs newest roll with this potion when still on the shelf (see TryGetTestMixIndices).
+        private string _lastMixedInstanceId;
+
         public int SelectedIndex { get; private set; } = -1;
 
-        // Cached potion per slot when Select() was called so UI still resolves the same instance after list mutations if needed.
         private PotionData[] _cachedPotionBySlot;
 
-        public int MaxSlots => _manager != null ? _manager.MaxSlots : _maxSlots;
+        public int MaxSlots => _maxSlots;
+
+        public IReadOnlyList<PotionData> Inventory => _inventory;
+
+        public bool HasFreeSlot()
+        {
+            return _inventory.Count < _maxSlots;
+        }
 
         public event Action InventoryChanged;
         public event Action<int> SelectionChanged;
-        
+
         private void Awake()
         {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
 
             Instance = this;
-
             if (_maxSlots <= 0)
             {
                 _maxSlots = 8;
@@ -43,37 +64,13 @@ namespace CrossFade.Potions
 
             _roller = new PotionRoller();
             _mixer = new PotionMixer();
-            _manager = new PotionManager(_roller, _mixer, _maxSlots);
             _cachedPotionBySlot = new PotionData[_maxSlots];
-        }
 
-        
-        public void OnRollButtonClicked()
-        {
-
-
-            if (!TryRollAndStorePotion())
-            {
-                Debug.Log("Roll failed.");
-                return;
-            }
-
-            var inv = GetInventory();
-            var p = inv[inv.Count - 1]; // last added
-
-            var effects = "";
-            for (var i = 0; i < p.Effects.Count; i++)
-            {
-                var e = p.Effects[i];
-                effects += $"{e.EffectType}={e.Value} ";
-            }
-
-            Debug.Log($"Potion: {p.Name} | Rarity: {p.Rarity}\n{effects}");
+            DontDestroyOnLoad(gameObject);
         }
 
         private void Start()
         {
-            // TODO(teammate): Replace with Resources.Load, ScriptableObject, or server data
             RefreshCache();
         }
 
@@ -89,208 +86,198 @@ namespace CrossFade.Potions
         {
             RefreshCache();
             InventoryChanged?.Invoke();
+            InvalidateLastMixedIfMissing();
         }
 
-        public void Select(int index)
+        private void InvalidateLastMixedIfMissing()
         {
-            if (index < -1 || index >= _manager.MaxSlots)
+            if (string.IsNullOrEmpty(_lastMixedInstanceId))
             {
                 return;
             }
 
-            if (index >= 0)
+            for (var i = 0; i < _inventory.Count; i++)
             {
-                var atSlot = GetAt(index);
-                if (atSlot == null)
+                if (_inventory[i].InstanceId == _lastMixedInstanceId)
                 {
                     return;
                 }
-
-                _cachedPotionBySlot[index] = atSlot;
             }
 
-            SelectedIndex = index;
-            RefreshCache();
-            SelectionChanged?.Invoke(SelectedIndex);
+            _lastMixedInstanceId = null;
         }
 
-        private void RefreshCache()
+        // For testing mix button: newest inventory entry vs last mix result if still present, else the two newest slots.
+        private bool TryGetTestMixIndices(out int leftIndex, out int rightIndex)
         {
-            for (var i = 0; i < _cachedPotionBySlot.Length; i++)
-            {
-                _cachedPotionBySlot[i] = null;
-            }
-
-            var inv = _manager.Inventory;
-            for (var i = 0; i < inv.Count && i < _cachedPotionBySlot.Length; i++)
-            {
-                _cachedPotionBySlot[i] = inv[i];
-            }
-        }
-
-        private PotionData GetAtInternal(int index)
-        {
-            if (_manager == null)
-            {
-                return null;
-            }
-
-            var inv = _manager.Inventory;
-            if (index < 0 || index >= inv.Count)
-            {
-                return null;
-            }
-
-            return inv[index];
-        }
-
-        // Potion at inventory index, or null if empty / out of range.
-        public PotionData GetAt(int index)
-        {
-            if (index < 0 || index >= _manager.MaxSlots)
-            {
-                return null;
-            }
-
-            var fromManager = GetAtInternal(index);
-            if (fromManager != null)
-            {
-                return fromManager;
-            }
-
-            return index < _cachedPotionBySlot.Length ? _cachedPotionBySlot[index] : null;
-        }
-
-        // True if another potion can be rolled into inventory.
-        public bool HasFreeSlot()
-        {
-            return _manager != null && _manager.HasFreeSlot();
-        }
-
-        // Read-only view of current potions (same list as PotionManager).
-        public IReadOnlyList<PotionData> GetInventory()
-        {
-            return _manager != null ? _manager.Inventory : Array.Empty<PotionData>();
-        }
-
-        // Adds a rolled potion; when at max capacity, discards the oldest (index 0) and appends the new one.
-        public bool TryRollAndStorePotion()
-        {
-            if (_manager == null)
+            leftIndex = rightIndex = -1;
+            InvalidateLastMixedIfMissing();
+            if (_inventory.Count < 2)
             {
                 return false;
             }
 
-            var wasAtCapacity = GetInventory().Count >= MaxSlots;
-
-            var ok = _manager.TryRollAndStorePotion();
-            if (ok)
+            var newestIdx = _inventory.Count - 1;
+            var mixedIdx = -1;
+            if (!string.IsNullOrEmpty(_lastMixedInstanceId))
             {
-                if (wasAtCapacity)
+                for (var i = 0; i < _inventory.Count; i++)
                 {
-                    if (SelectedIndex == 0)
+                    if (_inventory[i].InstanceId == _lastMixedInstanceId)
                     {
-                        SelectedIndex = -1;
-                        SelectionChanged?.Invoke(SelectedIndex);
-                    }
-                    else if (SelectedIndex > 0)
-                    {
-                        SelectedIndex--;
-                        SelectionChanged?.Invoke(SelectedIndex);
+                        mixedIdx = i;
+                        break;
                     }
                 }
-
-                OnInventoryMutated();
             }
 
-            return ok;
+            if (mixedIdx >= 0 && mixedIdx != newestIdx)
+            {
+                leftIndex = Mathf.Min(mixedIdx, newestIdx);
+                rightIndex = Mathf.Max(mixedIdx, newestIdx);
+                return true;
+            }
+
+            leftIndex = newestIdx - 1;
+            rightIndex = newestIdx;
+            return true;
         }
 
-        // Combines two inventory entries; replaces lower index, removes higher.
-        public bool TryMixByIndex(int leftIndex, int rightIndex)
+        private void AfterRemoval(int removedIndex)
         {
-            if (_manager == null)
+            if (SelectedIndex < 0)
             {
-                return false;
+                return;
             }
 
-            try
-            {
-                var ok = _manager.TryMixByIndex(leftIndex, rightIndex);
-                if (ok)
-                {
-                    OnInventoryMutated();
-                    if (SelectedIndex == rightIndex || SelectedIndex == leftIndex)
-                    {
-                        // TODO(teammate): Tweak selection rules if mixed indices should focus the result slot.
-                        SelectedIndex = Mathf.Min(leftIndex, rightIndex);
-                        SelectionChanged?.Invoke(SelectedIndex);
-                    }
-                }
-
-                return ok;
-            }
-            catch (ArgumentException)
-            {
-                // TODO(teammate): Surface validation errors to UI if desired.
-                return false;
-            }
-        }
-
-        // Consumes and removes potion at index; returns it for applying stats / timing. See PotionManager TODO hooks.
-        public PotionData ConsumePotionAt(int index)
-        {
-            if (_manager == null)
-            {
-                return null;
-            }
-
-            PotionData consumed;
-            try
-            {
-                consumed = _manager.ConsumePotion(index);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                return null;
-            }
-
-            if (index >= 0 && index < _cachedPotionBySlot.Length)
-            {
-                _cachedPotionBySlot[index] = null;
-            }
-
-            // Re-align cache indices after removal (list shifts).
-            RefreshCache();
-
-            if (SelectedIndex == index)
+            if (SelectedIndex == removedIndex)
             {
                 SelectedIndex = -1;
                 SelectionChanged?.Invoke(-1);
             }
-            else if (SelectedIndex > index)
+            else if (SelectedIndex > removedIndex)
             {
                 SelectedIndex--;
                 SelectionChanged?.Invoke(SelectedIndex);
             }
-
-            // TODO(teammate): Apply PotionTiming / PlayerStatsTemp when consuming (call site may move to a dedicated effect applier).
-            InventoryChanged?.Invoke();
-            return consumed;
         }
 
-        // Clears cached selection for a slot without consuming (e.g. UI cancel). Does not remove from inventory.
-        public void ClearSlotCache(int index)
+        // Same idea as former _manager == null: roller/mixer/cache are created in Awake.
+        private bool IsInventoryReady()
         {
-            if (index >= 0 && index < _cachedPotionBySlot.Length)
+            return _roller != null && _mixer != null && _cachedPotionBySlot != null;
+        }
+
+        public bool TryRollAndStorePotion()
+        {
+            if (!IsInventoryReady())
+            {
+                return false;
+            }
+
+            var wasAtCapacity = _inventory.Count >= _maxSlots;
+
+            var potion = _roller.RollPotion();
+            if (_inventory.Count >= _maxSlots)
+            {
+                _inventory.RemoveAt(0);
+            }
+
+            _inventory.Add(potion);
+
+            if (wasAtCapacity)
+            {
+                AfterRemoval(0);
+            }
+
+            OnInventoryMutated();
+            return true;
+        }
+
+        public bool TryMixByIndex(int leftIndex, int rightIndex)
+        {
+            if (!IsInventoryReady())
+            {
+                return false;
+            }
+
+            try
+            {
+                ThrowIfInvalidMixIndices(leftIndex, rightIndex);
+
+                var mixedPotion = _mixer.Mix(_inventory[leftIndex], _inventory[rightIndex]);
+                var higherIndex = Math.Max(leftIndex, rightIndex);
+                var lowerIndex = Math.Min(leftIndex, rightIndex);
+                _inventory[lowerIndex] = mixedPotion;
+                _inventory.RemoveAt(higherIndex);
+
+                _lastMixedInstanceId = mixedPotion.InstanceId;
+
+                OnInventoryMutated();
+                if (SelectedIndex == rightIndex || SelectedIndex == leftIndex)
+                {
+                    SelectedIndex = Mathf.Min(leftIndex, rightIndex);
+                    SelectionChanged?.Invoke(SelectedIndex);
+                }
+
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                // Invalid indices, duplicate index, or PotionMixer.Mix rules (e.g. consumed potion).
+                return false;
+            }
+        }
+
+        public PotionData ConsumePotionAt(int index)
+        {
+            if (!IsInventoryReady())
+            {
+                return null;
+            }
+
+            if (index < 0 || index >= _inventory.Count)
+            {
+                return null;
+            }
+
+            var consumed = _inventory[index];
+            consumed.IsConsumed = true;
+            _inventory.RemoveAt(index);
+
+            if (index < _cachedPotionBySlot.Length)
             {
                 _cachedPotionBySlot[index] = null;
             }
 
-            if (SelectedIndex == index)
+            RefreshCache();
+
+            AfterRemoval(index);
+
+            if (PlayerPotionStats.Instance != null)
             {
-                SelectedIndex = -1;
-                SelectionChanged?.Invoke(-1);
+                PlayerPotionStats.Instance.ApplyConsumedPotion(consumed);
+            }
+
+            InventoryChanged?.Invoke();
+            return consumed;
+        }
+
+        private void ThrowIfInvalidMixIndices(int leftIndex, int rightIndex)
+        {
+            if (leftIndex < 0 || leftIndex >= _inventory.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(leftIndex));
+            }
+
+            if (rightIndex < 0 || rightIndex >= _inventory.Count)
+            {
+                throw new ArgumentOutOfRangeException(nameof(rightIndex));
+            }
+
+            if (leftIndex == rightIndex)
+            {
+                throw new ArgumentException("Indices must differ.");
             }
         }
     }
