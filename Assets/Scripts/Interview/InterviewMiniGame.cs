@@ -23,7 +23,27 @@ public class InterviewMiniGame : MonoBehaviour
 
     private void Start()
     {
+        ApplyPotionContextFromSession();
         StartMiniGame();
+    }
+
+    // Reads <see cref="PlayerPotionStats"/> (persists via DontDestroyOnLoad on that component's GameObject) and applies VFX hooks + minigame tuning.
+    void ApplyPotionContextFromSession()
+    {
+        PotionEffectVfxHooks.ApplyAllFromPlayerStats();
+
+        var stats = PlayerPotionStats.Instance;
+        if (stats != null)
+        {
+            float d = PotionEffectVfxHooks.ComputeInterviewDistortion(stats);
+            if (d > 0f)
+            {
+                distortion = Mathf.Clamp01(Mathf.Max(distortion, d));
+            }
+
+            float timeMul = PotionEffectVfxHooks.ComputeInterviewTimeMultiplier(stats);
+            timeToAnswer *= timeMul;
+        }
     }
 
     void Update()

@@ -9,6 +9,7 @@ using UnityEngine;
  * Main APIs / usage:
  *   - Wire these on UI Buttons in the Inspector (pass slot index for OnPotionSlotClicked where supported).
  *   - OnMixButtonClicked (testing): pairs newest roll with last mix result when possible; else last two slots.
+ *   - OnConsumeButtonClicked (testing): drinks last shelf potion; selection-based consume is commented below.
  */
 
 namespace CrossFade.Potions
@@ -105,22 +106,67 @@ namespace CrossFade.Potions
             }
         }
 
+        /*
+         * Selection-based consume (restore when shelf slot UI exists):
+         *
+         * public void OnConsumeButtonClicked()
+         * {
+         *     if (SelectedIndex < 0)
+         *     {
+         *         Debug.Log("Consume failed: no potion selected.");
+         *         return;
+         *     }
+         *
+         *     var consumed = ConsumePotionAt(SelectedIndex);
+         *     if (consumed == null)
+         *     {
+         *         Debug.Log("Consume failed.");
+         *         return;
+         *     }
+         *
+         *     Debug.Log($"Consumed potion: {consumed.Name} | Rarity: {consumed.Rarity}");
+         * }
+         */
+
+        // Testing: drink the last potion on the shelf (no slot selection). Applies stats via ConsumePotionAt → PlayerPotionStats.
         public void OnConsumeButtonClicked()
         {
-            if (SelectedIndex < 0)
+            var inv = Inventory;
+            if (inv.Count == 0)
             {
-                Debug.Log("Consume failed: no potion selected.");
+                Debug.Log("Drink failed: shelf empty.");
                 return;
             }
 
-            var consumed = ConsumePotionAt(SelectedIndex);
+            var index = inv.Count - 1;
+            var consumed = ConsumePotionAt(index);
             if (consumed == null)
             {
-                Debug.Log("Consume failed.");
+                Debug.Log("Drink failed.");
                 return;
             }
 
-            Debug.Log($"Consumed potion: {consumed.Name} | Rarity: {consumed.Rarity}");
+            LogSimulatedDrinkEffects(consumed);
+        }
+
+        private static void LogSimulatedDrinkEffects(PotionData potion)
+        {
+            var stats = PlayerPotionStats.Instance;
+            var line = $"[Drink / simulate] {potion.Name} | Rarity: {potion.Rarity}\n{potion.FormatEffectsForDebug()}";
+
+            if (stats == null)
+            {
+                Debug.Log($"{line}\n(PlayerPotionStats not in scene — effects not stored.)");
+                return;
+            }
+
+            line += "\n--- Player totals after this drink ---";
+            foreach (var t in PotionRules.CoreEffects)
+            {
+                line += $"\n  {t}: {stats.GetTotal(t):F1}";
+            }
+
+            Debug.Log(line);
         }
     }
 }

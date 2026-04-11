@@ -10,7 +10,8 @@ using UnityEngine;
  *   - ApplyConsumedPotion: adds GetEffectValue per type; ResetTotals clears the session.
  *
  * Main APIs / usage:
- *   - Add component to Player (or persistent root); PotionController calls ApplyConsumedPotion on consume.
+ *   - Add component to Player (or persistent root); first instance uses DontDestroyOnLoad so totals survive scene loads.
+ *   - PotionController calls ApplyConsumedPotion on consume.
  *   - HUD / minigames read GetTotal(EffectType) and subscribe to StatsChanged.
  */
 
@@ -32,6 +33,7 @@ public class PlayerPotionStats : MonoBehaviour
         }
 
         Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     private void OnDestroy()
