@@ -1,26 +1,20 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 /*
  * PotionRoller.cs — Procedural potion generation
  *
- * What it does:
- *   Picks a rarity via weighted random, filters templates to that rarity, picks one template,
- *   then BuildPotionFromTemplate sets Rarity from template, Name from Resources/PotionNaming.json
- *   (random affix + random suffix as "Affix Suffix"), and rolls every PotionRules.CoreEffects value 1–10.
+ * What lives here:
+ *   - Weighted rarity roll, then Name / Affix / Suffix from PotionNaming (Resources JSON).
+ *   - One rolled value per PotionRules.CoreEffects (range PotionRules.MinRollValue–MaxRollValue).
  *
  * Main APIs / usage:
- *   - RollPotion(templates): entry point from PotionManager.TryRollAndStorePotion; needs non-empty template list per rarity.
- *   - RollRarity: weighted wheel using internal _rarityWeights.
- *   - BuildPotionFromTemplate: creates PotionData with all six effects rolled.
- *   - SetRarityWeights: runtime balance/testing override.
- *   - RollCoreEffectValue: private 1–10 roll helper.
+ *   - RollPotion / BuildRolledPotion: called from PotionController.TryRollAndStorePotion.
+ *   - SetRarityWeights: optional runtime tuning for testing or balance.
  */
 
 namespace CrossFade.Potions
 {
-    // Responsible for rarity rolls, template selection, and effect value rolling.
     public class PotionRoller
     {
         private static readonly PotionRarity[] RarityOrder =
@@ -53,37 +47,11 @@ namespace CrossFade.Potions
             }
         }
 
-        // Rolls a complete potion instance from available templates.
-        public PotionData RollPotion(IReadOnlyList<PotionTemplate> templates)
+        // Rolls a complete potion instance (rarity, display name from JSON affix/suffix, core effects 1–10).
+        public PotionData RollPotion()
         {
-            if (templates == null)
-            {
-                throw new ArgumentNullException(nameof(templates));
-            }
-
-            if (templates.Count == 0)
-            {
-                throw new ArgumentException("Templates cannot be empty.", nameof(templates));
-            }
-
             var rarity = RollRarity();
-            var matches = new List<PotionTemplate>();
-            for (var i = 0; i < templates.Count; i++)
-            {
-                var t = templates[i];
-                if (t != null && t.Rarity == rarity)
-                {
-                    matches.Add(t);
-                }
-            }
-
-            if (matches.Count == 0)
-            {
-                throw new ArgumentException("No template matches rolled rarity: " + rarity, nameof(templates));
-            }
-
-            var pick = matches[UnityEngine.Random.Range(0, matches.Count)];
-            return BuildPotionFromTemplate(pick);
+            return BuildRolledPotion(rarity);
         }
 
         // Rolls a rarity tier based on configured weights.
@@ -129,16 +97,11 @@ namespace CrossFade.Potions
             return RarityOrder[RarityOrder.Length - 1];
         }
 
-        // Creates a runtime potion instance from a selected template.
-        // Name = random affix + random suffix from JSON; template DisplayName is not used for the final name.
+        // Creates a runtime potion instance for a rolled rarity.
+        // Name = random affix + random suffix from JSON (display name).
         // Every core effect is procedurally rolled from 1..10.
-        public PotionData BuildPotionFromTemplate(PotionTemplate template)
+        public PotionData BuildRolledPotion(PotionRarity rarity)
         {
-            if (template == null)
-            {
-                throw new ArgumentNullException(nameof(template));
-            }
-
             var affix = PotionNaming.PickRandomAffix(_namingData);
             var suffix = PotionNaming.PickRandomSuffix(_namingData);
             var potion = new PotionData
@@ -146,7 +109,7 @@ namespace CrossFade.Potions
                 Affix = affix,
                 Suffix = suffix,
                 Name = $"{affix} {suffix}",
-                Rarity = template.Rarity
+                Rarity = rarity
             };
 
             var effectTypes = PotionRules.CoreEffects;
@@ -158,6 +121,8 @@ namespace CrossFade.Potions
             }
 
             return potion;
+            // Output should look like:
+            // PotionData(InstanceId=..., Name=..., Affix=..., Suffix=..., Rarity=..., Effects=..., IsConsumed=...)
         }
 
         // Sets or overrides rarity weights at runtime for balancing/testing.
