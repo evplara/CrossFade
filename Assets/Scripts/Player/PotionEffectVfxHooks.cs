@@ -33,12 +33,18 @@ public static class PotionEffectVfxHooks
             return;
         }
 
+        if (EffectsManager.instance == null)
+        {
+            Debug.LogError("Effects Manager missing: Can't play effects");
+        }
+
         switch (effectType)
         {
             case EffectType.High:
                 if (value >= PotionRules.GreenOutThreshold)
                 {
                     // TODO: heavy high / green-out VFX
+                    EffectsManager.instance.ActiveHigh(value);
                     Debug.Log("Heavy high / green-out VFX");
                 }
                 else
@@ -49,27 +55,29 @@ public static class PotionEffectVfxHooks
                 break;
 
             case EffectType.Dizziness:
-                // TODO: camera sway, motion blur, etc.
+                EffectsManager.instance.ActivateDizzy(value);
                 Debug.Log("Dizziness value: " + value);
                 break;
 
             case EffectType.Nausea:
-                // TODO: vignette, color shift
+                EffectsManager.instance.ActiveNausea(value);
                 Debug.Log("Nausea value: " + value);
                 break;
 
             case EffectType.Hallucination:
-                // TODO: distortion shader, wobble
+                EffectsManager.instance.ActivateHallucination(value);
                 Debug.Log("Hallucination value: " + value);
                 break;
 
             case EffectType.Lethargy:
                 // TODO: desaturate, slow UI
+                EffectsManager.instance.ActivateLethargy(value);
                 Debug.Log("Lethargy value: " + value);
                 break;
 
             case EffectType.Focus:
                 // TODO: sharpen, calm vignette
+                EffectsManager.instance.ActivateFocus(value);
                 Debug.Log("Focus value: " + value);
                 break;
 
