@@ -8,7 +8,13 @@ public class GhostsEffect : MonoBehaviour
     [SerializeField] private GameObject ghostImage;
     [SerializeField] private List<Transform> spawnPositions = new();
     private List<Vector3> spawners = new();
-    [SerializeField] private float spawnRate = 3;
+
+    [System.Serializable]
+    public struct SpawnRate
+    {
+        public int minSpawnRate;
+        public int maxSpawnRate;
+    }
 
     [System.Serializable]
     public struct SpawnAmount
@@ -17,7 +23,11 @@ public class GhostsEffect : MonoBehaviour
         public int maxSpawnAmount;
     }
 
+    private int realSpawnAmount;
+    private int realSpawnRate;
+
     [SerializeField] private SpawnAmount spawnAmount;
+    [SerializeField] private SpawnAmount spawnRate;
 
     private void Start()
     {
@@ -30,12 +40,12 @@ public class GhostsEffect : MonoBehaviour
 
     private IEnumerator Spawner()
     {
+        yield return null;
+
         while (true)
         {
-            int randomGhosts = Random.Range(spawnAmount.minSpawnAmount, spawnAmount.maxSpawnAmount);
-
-            SpawnGhosts(randomGhosts);
-            yield return new WaitForSeconds(spawnRate);
+            SpawnGhosts(realSpawnAmount);
+            yield return new WaitForSeconds(realSpawnRate);
         }
     }
 
@@ -51,5 +61,14 @@ public class GhostsEffect : MonoBehaviour
             ghost.Setup(isLeft);
             tempSpawners.RemoveAt(random);
         }
+    }
+
+    public void SetRates(float value)
+    {
+        float amount = Mathf.Lerp(spawnAmount.minSpawnAmount, spawnAmount.maxSpawnAmount, value);
+        realSpawnAmount = Mathf.RoundToInt(amount);
+
+        float rate = Mathf.Lerp(spawnRate.minSpawnAmount, spawnRate.maxSpawnAmount, value);
+        realSpawnRate = Mathf.RoundToInt(rate);
     }
 }
