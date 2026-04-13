@@ -43,6 +43,7 @@ public class InterviewMiniGame : MonoBehaviour
 
             float timeMul = PotionEffectVfxHooks.ComputeInterviewTimeMultiplier(stats);
             timeToAnswer *= timeMul;
+            Debug.Log("Time to answer: " + timeToAnswer);
         }
     }
 
