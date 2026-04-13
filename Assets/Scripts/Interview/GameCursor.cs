@@ -12,10 +12,6 @@ public class GameCursor : MonoBehaviour
     [SerializeField] private GraphicRaycaster raycaster;
     [SerializeField] private Camera renderCamera;
 
-    [Header("Movement")]
-    [Range(0f, 1f)]
-    [SerializeField] private float cursorSpeed = 1f;
-
     private Vector2 screenPosition;
     private GameObject pressedObject;
 
@@ -38,7 +34,7 @@ public class GameCursor : MonoBehaviour
     {
         Vector2 mouseDelta = Input.mousePositionDelta;
 
-        screenPosition += mouseDelta * cursorSpeed;
+        screenPosition += mouseDelta * EffectsManager.instance.LethargyValue;
 
         screenPosition.x = Mathf.Clamp(screenPosition.x, 0, Screen.width);
         screenPosition.y = Mathf.Clamp(screenPosition.y, 0, Screen.height);

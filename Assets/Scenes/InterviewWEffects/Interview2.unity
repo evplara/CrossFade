@@ -481,6 +481,14 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -595.18
       objectReference: {fileID: 0}
+    - target: {fileID: 4823754760545732032, guid: 3208d00805c225e428ad6029c315d700, type: 3}
+      propertyPath: spawnRate.maxSpawnAmount
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4823754760545732032, guid: 3208d00805c225e428ad6029c315d700, type: 3}
+      propertyPath: spawnRate.minSpawnAmount
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 5344122571617780074, guid: 3208d00805c225e428ad6029c315d700, type: 3}
       propertyPath: m_Name
       value: GhostSpawner
@@ -681,7 +689,7 @@ MonoBehaviour:
   canvas: {fileID: 2048131993}
   raycaster: {fileID: 2048131991}
   renderCamera: {fileID: 1153977399}
-  cursorSpeed: 0.406
+  cursorSpeed: 1
 --- !u!4 &717262332
 Transform:
   m_ObjectHideFlags: 0
