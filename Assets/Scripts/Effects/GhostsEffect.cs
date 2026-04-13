@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GhostsEffect : MonoBehaviour
 {
@@ -12,8 +11,8 @@ public class GhostsEffect : MonoBehaviour
     [System.Serializable]
     public struct SpawnRate
     {
-        public int minSpawnRate;
-        public int maxSpawnRate;
+        public float minSpawnRate;
+        public float maxSpawnRate;
     }
 
     [System.Serializable]
@@ -24,10 +23,10 @@ public class GhostsEffect : MonoBehaviour
     }
 
     private int realSpawnAmount;
-    private int realSpawnRate;
+    private float realSpawnRate;
 
     [SerializeField] private SpawnAmount spawnAmount;
-    [SerializeField] private SpawnAmount spawnRate;
+    [SerializeField] private SpawnRate spawnRate;
 
     private void Start()
     {
@@ -35,6 +34,7 @@ public class GhostsEffect : MonoBehaviour
         {
             spawners.Add(spanwer.position);
         }
+
         StartCoroutine(Spawner());
     }
 
@@ -53,7 +53,9 @@ public class GhostsEffect : MonoBehaviour
     {
         List<Vector3> tempSpawners = new List<Vector3>(spawners);
 
-        for (int i =0; i < ghostsToSpawn; i++)
+        int spawnCount = Mathf.Min(ghostsToSpawn, tempSpawners.Count);
+
+        for (int i =0; i < spawnCount; i++)
         {
             int random = Random.Range(0, tempSpawners.Count);
             Ghost ghost = Instantiate(ghostImage, tempSpawners[random], Quaternion.identity).GetComponent<Ghost>();
@@ -68,7 +70,7 @@ public class GhostsEffect : MonoBehaviour
         float amount = Mathf.Lerp(spawnAmount.minSpawnAmount, spawnAmount.maxSpawnAmount, value);
         realSpawnAmount = Mathf.RoundToInt(amount);
 
-        float rate = Mathf.Lerp(spawnRate.minSpawnAmount, spawnRate.maxSpawnAmount, value);
-        realSpawnRate = Mathf.RoundToInt(rate);
+        float rate = Mathf.Lerp(spawnRate.minSpawnRate, spawnRate.maxSpawnRate, value);
+        realSpawnRate = rate;
     }
 }
