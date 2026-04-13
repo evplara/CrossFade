@@ -34,6 +34,7 @@ public class EffectsManager : MonoBehaviour
     //use this value to slow down actions: cursor speed in interview, how fast the car switches lanes in driving
     public void ActivateLethargy(float value)
     {
+        Debug.Log("Activate lethargy");
         lethargyValue = Random.Range(0, 1f);
     }
 
