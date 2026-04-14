@@ -25,12 +25,25 @@ public class AnimationManager : MonoBehaviour
 
     private float[] xPositions = new float[] { -0.37f, 0f, 0.37f };
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+
+    public void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
+
     public void PlaySlotMachine()
     {
         // Disable button immediately
         if (slotButton != null)
         {
             slotButton.interactable = false;
+        }
+
+        if (audioSource != null)
+        {
+            audioSource.Play();
         }
 
         // Trigger animations
