@@ -10,7 +10,7 @@ public class EffectsManager : MonoBehaviour
     [SerializeField] private Volume volume;
     [SerializeField] private GameObject ghostEffect;
 
-    private float lethargyValue;
+    private float lethargyValue = 1f;
     public float LethargyValue => lethargyValue;
 
     private Vignette vignette;

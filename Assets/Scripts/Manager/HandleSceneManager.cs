@@ -29,6 +29,12 @@ public class HandleSceneManager : MonoBehaviour
         }
     }
 
+    //should change this later...
+    public void LoadPotionScene()
+    {
+        SceneManager.LoadSceneAsync("PotionRoom2");
+    }
+
     public void LoadScene(string sceneName)
     {
         if (string.IsNullOrWhiteSpace(sceneName))

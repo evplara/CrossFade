@@ -6094,6 +6094,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 6.1200027
       objectReference: {fileID: 0}
+    - target: {fileID: 6992620196185800101, guid: 6b50a6e83e80a56408aa638daf01a9f6, type: 3}
+      propertyPath: cameraShake
+      value: 
+      objectReference: {fileID: 519420033}
     - target: {fileID: 7103870740717200836, guid: 6b50a6e83e80a56408aa638daf01a9f6, type: 3}
       propertyPath: m_IsActive
       value: 0
