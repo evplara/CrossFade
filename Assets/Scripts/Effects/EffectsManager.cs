@@ -29,35 +29,33 @@ public class EffectsManager : MonoBehaviour
         volume.profile.TryGet(out colorAdjustments);
     }
 
-    //FOR LATER: Value has a range so we can lerp the value on our scale
-
     //use this value to slow down actions: cursor speed in interview, how fast the car switches lanes in driving
     public void ActivateLethargy(float value)
     {
-        lethargyValue = Random.Range(0, 1f);
+        lethargyValue = 1f - (value / 100f);
     }
 
     public void ActivateDizzy(float value)
     {
-        cameraShake.StartShake(100, Random.Range(0, 1f));
+        cameraShake.StartShake(100, value/100);
     }
 
     public void ActivateHallucination(float value)
     {
         ghostEffect.SetActive(true);
-        ghostEffect.GetComponent<GhostsEffect>().SetRates(Random.Range(0, 1f));
+        ghostEffect.GetComponent<GhostsEffect>().SetRates(value / 100);
     }
 
     public void ActivateFocus(float value)
     {
         bloom.active = true;
-        bloom.intensity.value = Random.Range(0, 1f);
+        bloom.intensity.value = value / 100;
     }
 
     public void ActiveNausea(float value)
     {
         vignette.active = true;
-        vignette.intensity.value = Random.Range(0, 1f);
+        vignette.intensity.value = value / 100;
     }
 
     public void ActiveHigh(float value)

@@ -168,7 +168,7 @@ namespace CrossFade.Potions
             return _roller != null && _mixer != null && _cachedPotionBySlot != null;
         }
 
-        public bool TryRollAndStorePotion()
+        public bool TryRollAndStorePotion(PotionRaritySO weights = null)
         {
             if (!IsInventoryReady())
             {
@@ -177,7 +177,7 @@ namespace CrossFade.Potions
 
             var wasAtCapacity = _inventory.Count >= _maxSlots;
 
-            var potion = _roller.RollPotion();
+            var potion = _roller.RollPotion(weights);
             if (_inventory.Count >= _maxSlots)
             {
                 _inventory.RemoveAt(0);

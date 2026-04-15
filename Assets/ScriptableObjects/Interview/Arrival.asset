@@ -15,8 +15,8 @@ MonoBehaviour:
   question: What time do you show up for work?
   responses:
   - response: On time.
-    score: 0.704
+    score: 0.945
   - response: 10 minutes early.
-    score: 0.883
+    score: 1
   - response: Depends on how I'm feeling.
     score: 0.23

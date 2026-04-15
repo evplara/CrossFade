@@ -16,9 +16,9 @@ namespace CrossFade.Potions
 {
     public partial class PotionController
     {
-        public void OnRollButtonClicked()
+        public void OnRollButtonClicked(PotionRaritySO weights = null)
         {
-            if (!TryRollAndStorePotion())
+            if (!TryRollAndStorePotion(weights))
             {
                 Debug.Log("Roll failed.");
                 return;

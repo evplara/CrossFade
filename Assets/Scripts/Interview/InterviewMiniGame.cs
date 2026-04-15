@@ -173,12 +173,37 @@ public class InterviewMiniGame : MonoBehaviour
         
         Debug.Log("Interview Complete. Final Score: " + finalScore);
         resultText.gameObject.SetActive(true);
+
+        bool playerWon = false;
         if (finalScore > 0.75f)
         {
+            playerWon = true;
             resultText.text = "Congrats you passed.";
         }else
         {
             resultText.text = "You failed.";
+        }
+
+        if (playerWon)
+        {
+            int moneyEarnedAmount = 100;
+
+            if (finalScore > 0.95f)
+            {
+                moneyEarnedAmount = 750;
+            }else if (finalScore > 0.9f)
+            {
+                moneyEarnedAmount = 600;
+            }else if (finalScore > 0.85f)
+            {
+                moneyEarnedAmount = 400;
+            }
+            else if (finalScore > 0.8f)
+            {
+                moneyEarnedAmount = 250;
+            }
+
+            PlayerPotionStats.Instance.ChangeMoney(moneyEarnedAmount);
         }
 
         StartCoroutine(ExitScene());

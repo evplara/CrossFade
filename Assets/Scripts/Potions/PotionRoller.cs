@@ -48,9 +48,10 @@ namespace CrossFade.Potions
         }
 
         // Rolls a complete potion instance (rarity, display name from JSON affix/suffix, core effects 1–10).
-        public PotionData RollPotion()
+        public PotionData RollPotion(PotionRaritySO weights = null)
         {
-            var rarity = RollRarity();
+
+            var rarity = weights != null ? RollCustomRarity(weights) : RollRarity();
             return BuildRolledPotion(rarity);
         }
 
@@ -91,6 +92,45 @@ namespace CrossFade.Potions
                 if (roll <= cumulative)
                 {
                     return r;
+                }
+            }
+
+            return RarityOrder[RarityOrder.Length - 1];
+        }
+
+        public PotionRarity RollCustomRarity(PotionRaritySO weights)
+        {
+            if (weights.rarityValues.Length == 0)
+            {
+                throw new InvalidOperationException("Rarity weights are empty.");
+            }
+
+            var totalWeight = 0f;
+            for (var i = 0; i < weights.rarityValues.Length; i++)
+            {
+                var r = weights.rarityValues[i];
+                if (r.value > 0f)
+                {
+                    totalWeight += r.value;
+                }
+            }
+
+            if (totalWeight <= 0f)
+            {
+                throw new InvalidOperationException("Total rarity weight must be positive.");
+            }
+
+            var roll = UnityEngine.Random.Range(0f, totalWeight);
+            var cumulative = 0f;
+            for (var i = 0; i < RarityOrder.Length; i++)
+            {
+                var r = weights.rarityValues[i];
+
+
+                cumulative += r.value;
+                if (roll <= cumulative)
+                {
+                    return r.rarity;
                 }
             }
 
