@@ -17,6 +17,6 @@ MonoBehaviour:
   - response: Headbutt them and yell in their face.
     score: 0
   - response: Leave the area.
-    score: 0.89
+    score: 1
   - response: Get manager.
-    score: 0.82
+    score: 1

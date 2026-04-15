@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
+using System.Collections;
 
 public class InterviewMiniGame : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class InterviewMiniGame : MonoBehaviour
     [SerializeField] private float timeToAnswer = 3f;
     [SerializeField] private TextMeshProUGUI questionText;
     [SerializeField] private TextMeshProUGUI timeText;
+    [SerializeField] private TextMeshProUGUI resultText;
     [SerializeField] private Transform buttonContainer;
     [SerializeField] private GameObject buttonPrefab;
     [Range(0, 1)]
@@ -168,14 +170,49 @@ public class InterviewMiniGame : MonoBehaviour
     private void EndMiniGame()
     {
         float finalScore = questionsAnswered > 0 ? score / questionsAnswered : 0f;
-
+        
         Debug.Log("Interview Complete. Final Score: " + finalScore);
+        resultText.gameObject.SetActive(true);
+
+        bool playerWon = false;
         if (finalScore > 0.75f)
         {
-            Debug.Log("Congrats you passed.");
+            playerWon = true;
+            resultText.text = "Congrats you passed.";
         }else
         {
-            Debug.Log("You failed.");
+            resultText.text = "You failed.";
         }
+
+        if (playerWon)
+        {
+            int moneyEarnedAmount = 100;
+
+            if (finalScore > 0.95f)
+            {
+                moneyEarnedAmount = 750;
+            }else if (finalScore > 0.9f)
+            {
+                moneyEarnedAmount = 600;
+            }else if (finalScore > 0.85f)
+            {
+                moneyEarnedAmount = 400;
+            }
+            else if (finalScore > 0.8f)
+            {
+                moneyEarnedAmount = 250;
+            }
+
+            PlayerPotionStats.Instance.ChangeMoney(moneyEarnedAmount);
+        }
+
+        StartCoroutine(ExitScene());
+    }
+
+    private IEnumerator ExitScene()
+    {
+        yield return new WaitForSeconds(1.5f);
+
+        HandleSceneManager.instance.LoadPotionScene();
     }
 }

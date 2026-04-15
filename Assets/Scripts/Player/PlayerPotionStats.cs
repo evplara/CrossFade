@@ -24,6 +24,10 @@ public class PlayerPotionStats : MonoBehaviour
 
     public event Action StatsChanged;
 
+    private int currentMoney;
+    public int CurrentMoney => currentMoney;
+    public event Action MoneyChanged;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -77,6 +81,7 @@ public class PlayerPotionStats : MonoBehaviour
         StatsChanged?.Invoke();
     }
 
+    //I'm going to set max to 100
     private void AddToTotal(EffectType effectType, float delta)
     {
         var idx = (int)effectType;
@@ -86,5 +91,14 @@ public class PlayerPotionStats : MonoBehaviour
         }
 
         _totals[idx] += delta;
+
+        if (_totals[idx] > 100) _totals[idx] = 100;
+    }
+
+    public void ChangeMoney(int money)
+    {
+        currentMoney += money;
+
+        MoneyChanged?.Invoke();
     }
 }
