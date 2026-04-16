@@ -1668,6 +1668,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PickRandomMiniGame
   miniGameNames:
   - Interview2
+  - CarEffects2
+  - InterviewA
 --- !u!4 &1103379729
 Transform:
   m_ObjectHideFlags: 0
@@ -2457,16 +2459,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1103379728}
-        m_TargetAssemblyTypeName: PickRandomMiniGame, Assembly-CSharp
-        m_MethodName: RandomMiniGame
-        m_Mode: 1
+      - m_Target: {fileID: 1671081060}
+        m_TargetAssemblyTypeName: HandleSceneManager, Assembly-CSharp
+        m_MethodName: LoadScene
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Interview2
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1617206673
@@ -2536,6 +2538,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0826f5b43959701459e7eb00ee8aabce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HandleSceneManager
+  miniGameSceneNames:
+  - Interview2
+  - CarEffects2
 --- !u!4 &1671081061
 Transform:
   m_ObjectHideFlags: 0

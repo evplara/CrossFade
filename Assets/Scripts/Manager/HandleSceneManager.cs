@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,6 +9,9 @@ using UnityEngine.SceneManagement;
 public class HandleSceneManager : MonoBehaviour
 {
     public static HandleSceneManager instance;
+
+    [SerializeField] private string[] miniGameSceneNames;
+    private string currentSceneName;
 
     private void Awake()
     {
@@ -32,7 +36,7 @@ public class HandleSceneManager : MonoBehaviour
     //should change this later...
     public void LoadPotionScene()
     {
-        SceneManager.LoadSceneAsync("PotionRoom2");
+        LoadScene("PotionRoom2");
     }
 
     public void LoadScene(string sceneName)
@@ -44,7 +48,31 @@ public class HandleSceneManager : MonoBehaviour
         }
 
         SceneManager.LoadScene(sceneName);
+        currentSceneName = sceneName;
     }
+
+    public void LoadRandomMiniGameScene()
+    {
+        if (miniGameSceneNames == null || miniGameSceneNames.Length == 0)
+        {
+            //default backup
+            LoadPotionScene();
+        }
+
+        var filterScenes = miniGameSceneNames.Where(scene => scene != currentSceneName).ToArray();
+
+        if (filterScenes == null)
+        {
+            LoadPotionScene();
+        }
+
+        int random = Random.Range(0, filterScenes.Length);
+        string targetScene = filterScenes[random];
+
+        LoadScene(targetScene);
+    }
+
+
 
     public void QuitGame()
     {
