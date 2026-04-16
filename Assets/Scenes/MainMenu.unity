@@ -906,7 +906,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0826f5b43959701459e7eb00ee8aabce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HandleSceneManager
-  miniGameSceneNames: []
+  miniGameSceneNames:
+  - Interview2
+  - CarEffects2
 --- !u!4 &1551523887
 Transform:
   m_ObjectHideFlags: 0
@@ -1221,8 +1223,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1551523886}
         m_TargetAssemblyTypeName: HandleSceneManager, Assembly-CSharp
-        m_MethodName: LoadScene
-        m_Mode: 5
+        m_MethodName: LoadPotionScene
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

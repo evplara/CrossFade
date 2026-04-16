@@ -72,7 +72,7 @@ public class SessionManager : MonoBehaviour
     //get your money reward: based on health, time, and effect value
     private void HandleMoney()
     {
-        float healthScore = HealthManager.Instance.CurrentHealth / HealthManager.Instance.MaxHealth;
+        float healthScore = (float)HealthManager.Instance.CurrentHealth / HealthManager.Instance.MaxHealth;
         float timeScore = SessionTimer.Instance.ElapsedSeconds / SessionTimer.Instance.MaxRoundTime;
         float effectScore = effectValue / PlayerPotionStats.Instance.MaxEffectTotal;
 
