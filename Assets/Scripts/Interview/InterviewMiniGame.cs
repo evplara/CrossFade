@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
+using System.Linq;
 
 public class InterviewMiniGame : MonoBehaviour
 {
     [SerializeField] private List<InterviewQuestionSO> interviewQuestions;
+    private List<InterviewQuestionSO> currentQuestions;
     [SerializeField] private float timeToReadQuestion = 2.5f;
     [SerializeField] private float timeToAnswer = 3f;
     [SerializeField] private TextMeshProUGUI questionText;
@@ -68,7 +70,10 @@ public class InterviewMiniGame : MonoBehaviour
 
     public void StartMiniGame()
     {
-        Shuffle(interviewQuestions);
+        currentQuestions = new List<InterviewQuestionSO>(interviewQuestions);
+        Shuffle(currentQuestions);
+        currentQuestions = currentQuestions.Take(3).ToList();
+
         currentIndex = 0;
         score = 0;
         ShowQuestion();
@@ -76,13 +81,13 @@ public class InterviewMiniGame : MonoBehaviour
 
     void ShowQuestion()
     {
-        if (currentIndex >= interviewQuestions.Count)
+        if (currentIndex >= currentQuestions.Count)
         {
             EndMiniGame();
             return;
         }
 
-        var q = interviewQuestions[currentIndex];
+        var q = currentQuestions[currentIndex];
 
         questionText.text = ApplyDistortion(q.question);
 
@@ -96,7 +101,7 @@ public class InterviewMiniGame : MonoBehaviour
 
     void ShowQuestions()
     {
-        var q = interviewQuestions[currentIndex];
+        var q = currentQuestions[currentIndex];
 
         List<InterviewResponse> shuffledResponses = new List<InterviewResponse>(q.responses);
         Shuffle(shuffledResponses);
@@ -152,7 +157,8 @@ public class InterviewMiniGame : MonoBehaviour
             child.GetComponent<Button>().interactable = false;
         }
 
-        //TODO: REmove X health
+        int damage = response != null ? response.damage : 1;
+        HealthManager.Instance.TakeDamage(damage);
 
         timeText.text = "";
         currentIndex++;
@@ -187,5 +193,10 @@ public class InterviewMiniGame : MonoBehaviour
             int rand = Random.Range(0, i + 1);
             (list[i], list[rand]) = (list[rand], list[i]);
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (active) HealthManager.Instance.TakeDamage(1);
     }
 }

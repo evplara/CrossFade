@@ -19,4 +19,4 @@ MonoBehaviour:
   - response: 10 minutes early.
     damage: 0
   - response: Depends on how I'm feeling.
-    damage: 30
+    damage: 1
