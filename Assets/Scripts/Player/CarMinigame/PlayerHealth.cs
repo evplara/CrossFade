@@ -2,10 +2,18 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
+/*
+ * PlayerHealth.cs — Car minigame damage bridge + VFX
+ *
+ * No longer owns HP. Forwards damage to HealthManager (global singleton).
+ * Still handles the car-specific feedback: camera shake, damage sound, red flash.
+ * CarMovement.cs still calls player.TakeDamage() on collision — no changes needed there.
+ */
+
 public class PlayerHealth : MonoBehaviour
 {
-    public int maxHealth = 3;
-    private int currentHealth;
+    // how much HP each car hit takes from the global pool
+    public int damagePerHit = 1;
 
     // 🎥 Camera shake
     public CameraShake cameraShake;
@@ -23,8 +31,6 @@ public class PlayerHealth : MonoBehaviour
 
     void Start()
     {
-        currentHealth = maxHealth;
-
         // Ensure overlay starts invisible
         if (damageOverlay != null)
         {
@@ -32,14 +38,31 @@ public class PlayerHealth : MonoBehaviour
             c.a = 0f;
             damageOverlay.color = c;
         }
+
+        // listen for death so this scene can react
+        if (HealthManager.Instance != null)
+        {
+            HealthManager.Instance.PlayerDied += OnPlayerDied;
+        }
     }
 
+    private void OnDestroy()
+    {
+        if (HealthManager.Instance != null)
+        {
+            HealthManager.Instance.PlayerDied -= OnPlayerDied;
+        }
+    }
+
+    // CarMovement still calls this on collision — we just forward it now
     public void TakeDamage()
     {
-        currentHealth -= 1;
-        Debug.Log("Player took damage! Current health: " + currentHealth);
+        if (HealthManager.Instance != null)
+        {
+            HealthManager.Instance.TakeDamage(damagePerHit);
+        }
 
-
+        // scene-local VFX
         if (cameraShake != null)
         {
             cameraShake.StartShake(shakeDuration, shakeMagnitude);
@@ -54,11 +77,6 @@ public class PlayerHealth : MonoBehaviour
         {
             StopCoroutine("FlashRed");
             StartCoroutine(FlashRed());
-        }
-
-        if (currentHealth <= 0)
-        {
-            Die();
         }
     }
 
@@ -90,9 +108,9 @@ public class PlayerHealth : MonoBehaviour
         damageOverlay.color = c;
     }
 
-    void Die()
+    void OnPlayerDied()
     {
-        Debug.Log("Player Died");
-        // probably go back to gacha area
+        Debug.Log("[PlayerHealth] Global health hit 0.");
+        // probably go back to gacha area or game over screen
     }
 }
