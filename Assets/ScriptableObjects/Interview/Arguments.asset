@@ -15,8 +15,8 @@ MonoBehaviour:
   question: What do you do when you get into an argument with a teammate?
   responses:
   - response: Headbutt them and yell in their face.
-    score: 0
+    damage: 40
   - response: Leave the area.
-    score: 1
+    damage: 0
   - response: Get manager.
-    score: 1
+    damage: 0
