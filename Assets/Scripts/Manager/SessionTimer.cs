@@ -79,9 +79,9 @@ public class SessionTimer : MonoBehaviour
     // pause the clock on death / game over — doesn't reset
     public void StopSession()
     {
-        SessionOver?.Invoke();
         isRunning = false;
         Debug.Log($"[SessionTimer] Session stopped at {elapsedSeconds:F1}s.");
+        SessionOver?.Invoke();
     }
 
     // pick up where we left off without resetting
