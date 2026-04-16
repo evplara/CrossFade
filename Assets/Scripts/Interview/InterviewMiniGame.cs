@@ -91,7 +91,7 @@ public class InterviewMiniGame : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        Invoke(nameof(ShowQuestions), 2.5f);
+        Invoke(nameof(ShowQuestions), 0f);
     }
 
     void ShowQuestions()
@@ -158,7 +158,7 @@ public class InterviewMiniGame : MonoBehaviour
         currentIndex++;
         active = false;
 
-        Invoke(nameof(ShowQuestion), 0.5f);
+        Invoke(nameof(ShowQuestion), 0f);
     }
 
     void StartTimer()
@@ -172,6 +172,7 @@ public class InterviewMiniGame : MonoBehaviour
         StartCoroutine(ExitScene());
     }
 
+    //if end early
     private IEnumerator ExitScene()
     {
         yield return new WaitForSeconds(1.5f);
