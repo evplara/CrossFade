@@ -15,7 +15,10 @@ public class MoneyUI : MonoBehaviour
 
     private void OnDisable()
     {
-        PlayerPotionStats.Instance.MoneyChanged -= UpdateMoney;
+        if (PlayerPotionStats.Instance != null)
+        {
+            PlayerPotionStats.Instance.MoneyChanged -= UpdateMoney;
+        }
     }
 
     private void Awake()

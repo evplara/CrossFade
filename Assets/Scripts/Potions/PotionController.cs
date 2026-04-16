@@ -47,6 +47,7 @@ namespace CrossFade.Potions
 
         public event Action InventoryChanged;
         public event Action<int> SelectionChanged;
+        public event Action<PotionData> OnPotionConsumed;
 
         private void Awake()
         {
@@ -260,6 +261,7 @@ namespace CrossFade.Potions
             }
 
             InventoryChanged?.Invoke();
+            OnPotionConsumed?.Invoke(consumed);
             return consumed;
         }
 

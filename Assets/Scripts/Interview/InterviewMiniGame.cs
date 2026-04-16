@@ -11,14 +11,12 @@ public class InterviewMiniGame : MonoBehaviour
     [SerializeField] private float timeToAnswer = 3f;
     [SerializeField] private TextMeshProUGUI questionText;
     [SerializeField] private TextMeshProUGUI timeText;
-    [SerializeField] private TextMeshProUGUI resultText;
     [SerializeField] private Transform buttonContainer;
     [SerializeField] private GameObject buttonPrefab;
     [Range(0, 1)]
     [SerializeField] private float distortion;
     private float timeRemaining;
     private int currentIndex;
-    private int questionsAnswered;
 
     private bool active;
     private float score;
@@ -70,8 +68,8 @@ public class InterviewMiniGame : MonoBehaviour
 
     public void StartMiniGame()
     {
+        Shuffle(interviewQuestions);
         currentIndex = 0;
-        questionsAnswered = 0;
         score = 0;
         ShowQuestion();
     }
@@ -93,14 +91,17 @@ public class InterviewMiniGame : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        Invoke(nameof(ShowQuestions), 2.5f);
+        Invoke(nameof(ShowQuestions), 0f);
     }
 
     void ShowQuestions()
     {
         var q = interviewQuestions[currentIndex];
 
-        foreach (InterviewResponse r in q.responses)
+        List<InterviewResponse> shuffledResponses = new List<InterviewResponse>(q.responses);
+        Shuffle(shuffledResponses);
+
+        foreach (InterviewResponse r in shuffledResponses)
         {
             GameObject button = Instantiate(buttonPrefab, buttonContainer);
 
@@ -151,14 +152,13 @@ public class InterviewMiniGame : MonoBehaviour
             child.GetComponent<Button>().interactable = false;
         }
 
-        score += response != null ? response.score : 0f;
+        //TODO: REmove X health
 
         timeText.text = "";
-        questionsAnswered++;
         currentIndex++;
         active = false;
 
-        Invoke(nameof(ShowQuestion), 0.5f);
+        Invoke(nameof(ShowQuestion), 0f);
     }
 
     void StartTimer()
@@ -169,50 +169,23 @@ public class InterviewMiniGame : MonoBehaviour
 
     private void EndMiniGame()
     {
-        float finalScore = questionsAnswered > 0 ? score / questionsAnswered : 0f;
-        
-        Debug.Log("Interview Complete. Final Score: " + finalScore);
-        resultText.gameObject.SetActive(true);
-
-        bool playerWon = false;
-        if (finalScore > 0.75f)
-        {
-            playerWon = true;
-            resultText.text = "Congrats you passed.";
-        }else
-        {
-            resultText.text = "You failed.";
-        }
-
-        if (playerWon)
-        {
-            int moneyEarnedAmount = 100;
-
-            if (finalScore > 0.95f)
-            {
-                moneyEarnedAmount = 750;
-            }else if (finalScore > 0.9f)
-            {
-                moneyEarnedAmount = 600;
-            }else if (finalScore > 0.85f)
-            {
-                moneyEarnedAmount = 400;
-            }
-            else if (finalScore > 0.8f)
-            {
-                moneyEarnedAmount = 250;
-            }
-
-            PlayerPotionStats.Instance.ChangeMoney(moneyEarnedAmount);
-        }
-
         StartCoroutine(ExitScene());
     }
 
+    //if end early
     private IEnumerator ExitScene()
     {
         yield return new WaitForSeconds(1.5f);
 
-        HandleSceneManager.instance.LoadPotionScene();
+        HandleSceneManager.instance.LoadRandomMiniGameScene();
+    }
+
+    private void Shuffle<T>(List<T> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int rand = Random.Range(0, i + 1);
+            (list[i], list[rand]) = (list[rand], list[i]);
+        }
     }
 }

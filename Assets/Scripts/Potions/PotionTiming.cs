@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 /*
  * PotionTiming.cs — Map PotionData stats to minigame timers (static helpers)
@@ -26,37 +27,54 @@ namespace CrossFade.Potions
 
         public const float DefaultRoundTotalSeconds = 45f;
 
-        public const float GreenedOutSecondsPerGame = 3f;
+        public const float GreenedOutSecondsPerGame = 5f;
 
         public const float GreenedOutRoundTotalSeconds = 30f;
 
         // Returns per-minigame duration based on effect values. (Add a gameIndex overload when a 4th minigame needs a fixed duration.)
-        public static float ResolveSecondsPerGame(PotionData potion)
+        public static float ResolveSecondsPerGame(List<PotionData> potions)
         {
-            if (potion == null)
+            if (potions == null || potions.Count == 0)
             {
                 return DefaultSecondsPerGame;
             }
 
-            if (potion.IsGreenedOut())
+            var maxEffect = 0f;
+
+            foreach (PotionData p in potions)
             {
-                return GreenedOutSecondsPerGame;
+                if (p.IsGreenedOut())
+                {
+                    return GreenedOutSecondsPerGame;
+                }
+
+                if (p.GetMaxEffectValue() > maxEffect)
+                {
+                    maxEffect = p.GetMaxEffectValue();
+                }
             }
 
-            var maxEffect = potion.GetMaxEffectValue();
             var reduction = ResolveReductionFromIntensity(maxEffect);
             return Mathf.Max(DefaultSecondsPerGame - reduction, MinimumSecondsPerGame);
         }
 
         // Returns total round budget before returning to brewing.
-        public static float ResolveRoundTotalSeconds(PotionData potion)
+        public static float ResolveRoundTotalSeconds(List<PotionData> potions)
         {
-            if (potion != null && potion.IsGreenedOut())
+            if (potions == null || potions.Count == 0)
             {
-                return GreenedOutRoundTotalSeconds;
+                return DefaultRoundTotalSeconds;
             }
-            return DefaultRoundTotalSeconds;
 
+            foreach(PotionData p in potions)
+            {
+                if (p.IsGreenedOut())
+                {
+                    return GreenedOutRoundTotalSeconds;
+                }
+            }
+
+            return DefaultRoundTotalSeconds;
         }
 
         private static float ResolveReductionFromIntensity(float maxEffect)

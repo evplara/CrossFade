@@ -372,6 +372,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 304298638}
   m_CullTransparentMesh: 1
+--- !u!1 &311511549
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 311511551}
+  - component: {fileID: 311511550}
+  m_Layer: 0
+  m_Name: SessionTimer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &311511550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 311511549}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4de38a601c3f142418ef72fc9330d698, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SessionTimer
+--- !u!4 &311511551
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 311511549}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1005.21576, y: 490.04218, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &453394410
 GameObject:
   m_ObjectHideFlags: 0
@@ -1500,6 +1544,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 755903202}
   m_CullTransparentMesh: 1
+--- !u!1 &831056331
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 831056333}
+  - component: {fileID: 831056332}
+  m_Layer: 0
+  m_Name: MiniGameTimer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &831056332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 831056331}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da16fff34838d4d8a9ebd82479f79eba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MinigameTimer
+--- !u!4 &831056333
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 831056331}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1005.21576, y: 490.04218, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &948680614
 GameObject:
   m_ObjectHideFlags: 0
@@ -1668,6 +1756,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PickRandomMiniGame
   miniGameNames:
   - Interview2
+  - CarEffects2
+  - InterviewA
 --- !u!4 &1103379729
 Transform:
   m_ObjectHideFlags: 0
@@ -2386,6 +2476,7 @@ GameObject:
   - component: {fileID: 1617206674}
   - component: {fileID: 1617206673}
   - component: {fileID: 1617206672}
+  - component: {fileID: 1617206675}
   m_Layer: 5
   m_Name: StartBTN
   m_TagString: Untagged
@@ -2457,9 +2548,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1103379728}
-        m_TargetAssemblyTypeName: PickRandomMiniGame, Assembly-CSharp
-        m_MethodName: RandomMiniGame
+      - m_Target: {fileID: 1617206675}
+        m_TargetAssemblyTypeName: StartMiniGameUI, Assembly-CSharp
+        m_MethodName: StartSessionTimer
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2507,6 +2598,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1617206670}
   m_CullTransparentMesh: 1
+--- !u!114 &1617206675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1617206670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70fc67c952dc9984a9992867ead76aaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StartMiniGameUI
 --- !u!1 &1671081059
 GameObject:
   m_ObjectHideFlags: 0
@@ -2536,6 +2639,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0826f5b43959701459e7eb00ee8aabce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HandleSceneManager
+  miniGameSceneNames:
+  - Interview2
+  - CarEffects2
 --- !u!4 &1671081061
 Transform:
   m_ObjectHideFlags: 0
@@ -3419,3 +3525,5 @@ SceneRoots:
   - {fileID: 1494393978}
   - {fileID: 1103379729}
   - {fileID: 1815769076}
+  - {fileID: 311511551}
+  - {fileID: 831056333}

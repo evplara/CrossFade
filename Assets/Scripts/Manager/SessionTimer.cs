@@ -19,6 +19,7 @@ using UnityEngine;
 public class SessionTimer : MonoBehaviour
 {
     public static SessionTimer Instance { get; private set; }
+    private float maxRoundTime;
 
     private float elapsedSeconds;
     private bool isRunning;
@@ -55,6 +56,13 @@ public class SessionTimer : MonoBehaviour
 
         elapsedSeconds += Time.deltaTime;
         TimerTick?.Invoke(elapsedSeconds);
+
+        //session ends
+        if (elapsedSeconds >= maxRoundTime)
+        {
+            ResetSession();
+            HandleSceneManager.instance.LoadPotionScene();
+        }
     }
 
     // call once when player starts a new run
@@ -84,13 +92,18 @@ public class SessionTimer : MonoBehaviour
     {
         elapsedSeconds = 0f;
         isRunning = false;
+        MinigameTimer.Instance.ResetTimer();
+    }
+
+    public void SetTime(float time)
+    {
+        maxRoundTime = time;
     }
 
     // returns "MM:SS" — handy if we ever show this on screen
     public string GetFormattedTime()
     {
-        int minutes = Mathf.FloorToInt(elapsedSeconds / 60f);
-        int seconds = Mathf.FloorToInt(elapsedSeconds % 60f);
-        return $"{minutes:00}:{seconds:00}";
+        float remaining = Mathf.Max(0f, maxRoundTime - elapsedSeconds);
+        return remaining.ToString("F1");
     }
 }
