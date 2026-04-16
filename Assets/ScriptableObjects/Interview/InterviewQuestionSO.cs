@@ -12,5 +12,5 @@ public class InterviewQuestionSO : ScriptableObject
 public class InterviewResponse
 {
     public string response;
-    public float damage;
+    public int damage;
 }

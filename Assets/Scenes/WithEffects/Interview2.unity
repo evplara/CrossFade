@@ -670,6 +670,9 @@ MonoBehaviour:
   interviewQuestions:
   - {fileID: 11400000, guid: 0cba5b049a97708489482b3b3d4ea79f, type: 2}
   - {fileID: 11400000, guid: adc9a6202e5d89c48b0895c6041cc460, type: 2}
+  - {fileID: 11400000, guid: 5f88ce08f5a9af9409aa71c7ea0de425, type: 2}
+  - {fileID: 11400000, guid: 8d2a4b83d144151489a941a234d7fa52, type: 2}
+  - {fileID: 11400000, guid: 9e25b19283b0d8a40a2c262fa0070de3, type: 2}
   timeToReadQuestion: 3
   timeToAnswer: 10
   questionText: {fileID: 133933091}

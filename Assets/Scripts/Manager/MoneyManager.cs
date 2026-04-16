@@ -17,7 +17,7 @@ public class MoneyManager : MonoBehaviour
 {
     public static MoneyManager Instance { get; private set; }
 
-    private int currentMoney;
+    private int currentMoney = 300;
 
     public int CurrentMoney => currentMoney;
 

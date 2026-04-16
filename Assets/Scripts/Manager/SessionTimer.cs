@@ -20,6 +20,8 @@ public class SessionTimer : MonoBehaviour
 {
     public static SessionTimer Instance { get; private set; }
     private float maxRoundTime;
+    public float MaxRoundTime => maxRoundTime;
+
 
     private float elapsedSeconds;
     private bool isRunning;
@@ -29,6 +31,7 @@ public class SessionTimer : MonoBehaviour
 
     // might be useful later for difficulty scaling or a HUD
     public event Action<float> TimerTick;
+    public event Action SessionOver;
 
     private void Awake()
     {
@@ -60,8 +63,8 @@ public class SessionTimer : MonoBehaviour
         //session ends
         if (elapsedSeconds >= maxRoundTime)
         {
-            ResetSession();
-            HandleSceneManager.instance.LoadPotionScene();
+            elapsedSeconds = maxRoundTime;
+            StopSession();
         }
     }
 
@@ -76,6 +79,7 @@ public class SessionTimer : MonoBehaviour
     // pause the clock on death / game over — doesn't reset
     public void StopSession()
     {
+        SessionOver?.Invoke();
         isRunning = false;
         Debug.Log($"[SessionTimer] Session stopped at {elapsedSeconds:F1}s.");
     }
@@ -92,7 +96,6 @@ public class SessionTimer : MonoBehaviour
     {
         elapsedSeconds = 0f;
         isRunning = false;
-        MinigameTimer.Instance.ResetTimer();
     }
 
     public void SetTime(float time)

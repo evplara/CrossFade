@@ -77,6 +77,31 @@ namespace CrossFade.Potions
             return DefaultRoundTotalSeconds;
         }
 
+        public static float GetEffectValue(List<PotionData> potions)
+        {
+            if (potions == null || potions.Count == 0)
+            {
+                return 0f;
+            }
+
+            var maxEffect = 0f;
+
+            foreach (PotionData p in potions)
+            {
+                if (p.IsGreenedOut())
+                {
+                    return -1;
+                }
+
+                if (p.GetMaxEffectValue() > maxEffect)
+                {
+                    maxEffect = p.GetMaxEffectValue();
+                }
+            }
+
+            return maxEffect;
+        }
+
         private static float ResolveReductionFromIntensity(float maxEffect)
         {
             if (maxEffect >= 14f)

@@ -11,7 +11,10 @@ public class StartMiniGameUI : MonoBehaviour
     }
     private void OnDisable()
     {
-        PotionController.Instance.OnPotionConsumed -= UpdatePotions;
+        if (PotionController.Instance != null)
+        {
+            PotionController.Instance.OnPotionConsumed -= UpdatePotions;
+        }
     }
 
     private void UpdatePotions(PotionData data)
@@ -23,10 +26,16 @@ public class StartMiniGameUI : MonoBehaviour
     {
         float gameValue = PotionTiming.ResolveSecondsPerGame(potionsConsumed);
         float roundValue = PotionTiming.ResolveRoundTotalSeconds(potionsConsumed);
+        float highestValue = PotionTiming.GetEffectValue(potionsConsumed);
 
+        //greened out case
+        if (highestValue == -1) highestValue = PlayerPotionStats.Instance.MaxEffectTotal;
+
+        SessionManager.Instance.SetHighScore(highestValue);
         SessionTimer.Instance.SetTime(roundValue);
         MinigameTimer.Instance.SetTime(gameValue);
 
+        HealthManager.Instance.ResetHealth();
         SessionTimer.Instance.StartSession();
         HandleSceneManager.instance.LoadRandomMiniGameScene();
     }
