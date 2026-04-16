@@ -64,12 +64,12 @@ public class KnifeMovement : MonoBehaviour
         sliceIsExecuting = false;
     }
 
-    void IsColliding()
+    bool IsColliding()
     {
-        if ()
+        return true;
     }
 
-    void OnCollisionEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Plane"))
         {
