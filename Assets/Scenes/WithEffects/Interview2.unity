@@ -426,6 +426,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0826f5b43959701459e7eb00ee8aabce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HandleSceneManager
+  miniGameSceneNames: []
 --- !u!4 &373035814
 Transform:
   m_ObjectHideFlags: 0
