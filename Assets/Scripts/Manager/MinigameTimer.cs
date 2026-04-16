@@ -31,6 +31,7 @@ using UnityEngine;
 public class MinigameTimer : MonoBehaviour
 {
     public static MinigameTimer Instance { get; private set; }
+    private float secondsPerRound;
 
     private float remainingSeconds;
     private float totalSeconds;
@@ -84,6 +85,7 @@ public class MinigameTimer : MonoBehaviour
             Debug.Log("[MinigameTimer] Timer expired.");
             TimerTick?.Invoke(0f);
             TimerExpired?.Invoke();
+            HandleSceneManager.instance.LoadRandomMiniGameScene();
         }
         else
         {
@@ -94,16 +96,22 @@ public class MinigameTimer : MonoBehaviour
     // starts a new countdown — replaces any existing one
     public void StartTimer(float seconds)
     {
-        if (seconds <= 0f)
-        {
-            Debug.LogWarning("[MinigameTimer] StartTimer called with <= 0 seconds, ignoring.");
-            return;
-        }
-
         totalSeconds = seconds;
         remainingSeconds = seconds;
         isRunning = true;
         Debug.Log($"[MinigameTimer] Started countdown: {seconds:F1}s");
+    }
+
+    public void StartTimerValue()
+    {
+        totalSeconds = secondsPerRound;
+        remainingSeconds = secondsPerRound;
+        isRunning = true;
+    }
+
+    public void SetTime(float time)
+    {
+        secondsPerRound = time;
     }
 
     // stop early without firing TimerExpired (player finished before time ran out, etc.)
