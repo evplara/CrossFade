@@ -57,13 +57,16 @@ public class HandleSceneManager : MonoBehaviour
         {
             //default backup
             LoadPotionScene();
+            return;
         }
 
         var filterScenes = miniGameSceneNames.Where(scene => scene != currentSceneName).ToArray();
 
-        if (filterScenes == null)
+        // if every scene got filtered out (only one minigame and we're in it), go back to potions
+        if (filterScenes.Length == 0)
         {
             LoadPotionScene();
+            return;
         }
 
         int random = Random.Range(0, filterScenes.Length);
