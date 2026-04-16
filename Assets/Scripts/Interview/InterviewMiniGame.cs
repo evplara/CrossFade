@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
+using System.Collections;
 
 public class InterviewMiniGame : MonoBehaviour
 {
@@ -16,14 +17,34 @@ public class InterviewMiniGame : MonoBehaviour
     [SerializeField] private float distortion;
     private float timeRemaining;
     private int currentIndex;
-    private int questionsAnswered;
 
     private bool active;
     private float score;
 
     private void Start()
     {
+        ApplyPotionContextFromSession();
         StartMiniGame();
+    }
+
+    // Reads <see cref="PlayerPotionStats"/> (persists via DontDestroyOnLoad on that component's GameObject) and applies VFX hooks + minigame tuning.
+    void ApplyPotionContextFromSession()
+    {
+        PotionEffectVfxHooks.ApplyAllFromPlayerStats();
+
+        var stats = PlayerPotionStats.Instance;
+        if (stats != null)
+        {
+            float d = PotionEffectVfxHooks.ComputeInterviewDistortion(stats);
+            if (d > 0f)
+            {
+                distortion = Mathf.Clamp01(Mathf.Max(distortion, d));
+            }
+
+            float timeMul = PotionEffectVfxHooks.ComputeInterviewTimeMultiplier(stats);
+            timeToAnswer *= timeMul;
+            Debug.Log("Time to answer: " + timeToAnswer);
+        }
     }
 
     void Update()
@@ -47,8 +68,8 @@ public class InterviewMiniGame : MonoBehaviour
 
     public void StartMiniGame()
     {
+        Shuffle(interviewQuestions);
         currentIndex = 0;
-        questionsAnswered = 0;
         score = 0;
         ShowQuestion();
     }
@@ -70,14 +91,17 @@ public class InterviewMiniGame : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        Invoke(nameof(ShowQuestions), 2.5f);
+        Invoke(nameof(ShowQuestions), 0f);
     }
 
     void ShowQuestions()
     {
         var q = interviewQuestions[currentIndex];
 
-        foreach (InterviewResponse r in q.responses)
+        List<InterviewResponse> shuffledResponses = new List<InterviewResponse>(q.responses);
+        Shuffle(shuffledResponses);
+
+        foreach (InterviewResponse r in shuffledResponses)
         {
             GameObject button = Instantiate(buttonPrefab, buttonContainer);
 
@@ -128,14 +152,13 @@ public class InterviewMiniGame : MonoBehaviour
             child.GetComponent<Button>().interactable = false;
         }
 
-        score += response != null ? response.score : 0f;
+        //TODO: REmove X health
 
         timeText.text = "";
-        questionsAnswered++;
         currentIndex++;
         active = false;
 
-        Invoke(nameof(ShowQuestion), 0.5f);
+        Invoke(nameof(ShowQuestion), 0f);
     }
 
     void StartTimer()
@@ -146,15 +169,23 @@ public class InterviewMiniGame : MonoBehaviour
 
     private void EndMiniGame()
     {
-        float finalScore = questionsAnswered > 0 ? score / questionsAnswered : 0f;
+        StartCoroutine(ExitScene());
+    }
 
-        Debug.Log("Interview Complete. Final Score: " + finalScore);
-        if (finalScore > 0.75f)
+    //if end early
+    private IEnumerator ExitScene()
+    {
+        yield return new WaitForSeconds(1.5f);
+
+        HandleSceneManager.instance.LoadRandomMiniGameScene();
+    }
+
+    private void Shuffle<T>(List<T> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
         {
-            Debug.Log("Congrats you passed.");
-        }else
-        {
-            Debug.Log("You failed.");
+            int rand = Random.Range(0, i + 1);
+            (list[i], list[rand]) = (list[rand], list[i]);
         }
     }
 }
