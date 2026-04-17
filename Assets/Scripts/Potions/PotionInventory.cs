@@ -85,5 +85,14 @@ namespace CrossFade.Potions
                 Select(-1);
             }
         }
+
+        // for potion in inventory, bottle 0 ... 3 equals potion
+        // get selection 1, get selection 2
+        // true
+        // mix 2 selection
+        // display in cup liquid tooltip
+
+        // drink
+        // start
     }
 }
