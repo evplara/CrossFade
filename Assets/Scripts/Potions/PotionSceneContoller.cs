@@ -1,7 +1,9 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using CrossFade.Potions;
 
 public class PotionSceneController : MonoBehaviour
@@ -18,11 +20,23 @@ public class PotionSceneController : MonoBehaviour
     [Header("Bottle Views")]
     [SerializeField] private PotionBottleView[] bottleViews;
 
+    [Header("Scene Transition")]
+    [SerializeField] private string nextSceneName = "PotionRoom2";
+    [SerializeField] private float resultDisplayTime = 2f;
+
+    [Header("Optional Custom Rarity Weights")]
+    [SerializeField] private PotionRaritySO rarityWeights;
+
+    [Header("Inventory")]
+    [SerializeField] private int maxSlots = 3;
+
+    private bool isTransitioning = false;
     private Vector3 liquidStartScale;
 
     private PotionRoller roller;
     private PotionMixer mixer;
-    private PotionManager manager;
+
+    private readonly List<PotionData> inventory = new();
 
     private void Start()
     {
@@ -31,22 +45,20 @@ public class PotionSceneController : MonoBehaviour
 
         roller = new PotionRoller();
         mixer = new PotionMixer();
-        manager = new PotionManager(roller, mixer, 3);
-
-        manager.SetTemplates(CreateTemplates());
 
         RefreshScene();
     }
 
     public void RollPotion()
     {
-        bool success = manager.TryRollAndStorePotion();
-
-        if (!success)
+        if (inventory.Count >= maxSlots)
         {
             debugText.text = "No free slot available.";
             return;
         }
+
+        PotionData newPotion = roller.RollPotion(rarityWeights);
+        inventory.Add(newPotion);
 
         debugText.text = "Rolled a potion.";
         RefreshScene();
@@ -54,15 +66,37 @@ public class PotionSceneController : MonoBehaviour
 
     public void MixPotion0And1()
     {
-        if (manager.Inventory.Count < 2)
+        if (isTransitioning)
+            return;
+
+        if (inventory.Count < 2)
         {
             debugText.text = "Need at least 2 potions to mix.";
             return;
         }
 
-        manager.TryMixByIndex(0, 1);
-        debugText.text = "Mixed potion 0 and potion 1.";
+        StartCoroutine(MixThenTransition());
+    }
+
+    private IEnumerator MixThenTransition()
+    {
+        isTransitioning = true;
+
+        PotionData mixedPotion = mixer.Mix(inventory[0], inventory[1]);
+        inventory[0] = mixedPotion;
+        inventory.RemoveAt(1);
+
+        debugText.text = "Mixed potion created!";
         RefreshScene();
+
+        if (inventory.Count > 0)
+        {
+            SelectPotion(0);
+        }
+
+        yield return new WaitForSeconds(resultDisplayTime);
+
+        SceneManager.LoadScene(nextSceneName);
     }
 
     public void ClearDisplay()
@@ -73,13 +107,13 @@ public class PotionSceneController : MonoBehaviour
 
     public void SelectPotion(int index)
     {
-        if (index < 0 || index >= manager.Inventory.Count)
+        if (index < 0 || index >= inventory.Count)
         {
             selectedPotionText.text = "No potion in this slot.";
             return;
         }
 
-        var potion = manager.Inventory[index];
+        var potion = inventory[index];
         selectedPotionText.text = FormatPotionDetails(potion);
         UpdateCupVisual(potion);
     }
@@ -89,7 +123,7 @@ public class PotionSceneController : MonoBehaviour
         RefreshInventoryText();
         RefreshBottleViews();
 
-        if (manager.Inventory.Count > 0)
+        if (inventory.Count > 0)
             SelectPotion(0);
         else
             ResetCupVisual();
@@ -100,15 +134,15 @@ public class PotionSceneController : MonoBehaviour
         var sb = new StringBuilder();
         sb.AppendLine("Inventory");
 
-        if (manager.Inventory.Count == 0)
+        if (inventory.Count == 0)
         {
             sb.AppendLine("(empty)");
         }
         else
         {
-            for (int i = 0; i < manager.Inventory.Count; i++)
+            for (int i = 0; i < inventory.Count; i++)
             {
-                var potion = manager.Inventory[i];
+                var potion = inventory[i];
                 sb.AppendLine($"{i}: {potion.Name} [{potion.Rarity}]");
             }
         }
@@ -120,9 +154,9 @@ public class PotionSceneController : MonoBehaviour
     {
         for (int i = 0; i < bottleViews.Length; i++)
         {
-            if (i < manager.Inventory.Count)
+            if (i < inventory.Count)
             {
-                bottleViews[i].SetPotion(this, i, manager.Inventory[i]);
+                bottleViews[i].SetPotion(this, i, inventory[i]);
             }
             else
             {
@@ -176,9 +210,11 @@ public class PotionSceneController : MonoBehaviour
 
     private Color BuildPotionColor(PotionData potion)
     {
-        float high = potion.GetEffectValue(EffectType.High) / PotionRules.MaxMixedValue;
-        float dizzy = potion.GetEffectValue(EffectType.Dizziness) / PotionRules.MaxMixedValue;
-        float focus = potion.GetEffectValue(EffectType.Focus) / PotionRules.MaxMixedValue;
+        const float colorNormalizeMax = 20f;
+
+        float high = potion.GetEffectValue(EffectType.High) / colorNormalizeMax;
+        float dizzy = potion.GetEffectValue(EffectType.Dizziness) / colorNormalizeMax;
+        float focus = potion.GetEffectValue(EffectType.Focus) / colorNormalizeMax;
 
         return new Color(
             Mathf.Clamp01(0.2f + high),
@@ -186,17 +222,5 @@ public class PotionSceneController : MonoBehaviour
             Mathf.Clamp01(0.2f + dizzy),
             1f
         );
-    }
-
-    private List<PotionTemplate> CreateTemplates()
-    {
-        return new List<PotionTemplate>
-        {
-            new PotionTemplate { TemplateId = "common_01", DisplayName = "Common Base", Rarity = PotionRarity.Common },
-            new PotionTemplate { TemplateId = "uncommon_01", DisplayName = "Uncommon Base", Rarity = PotionRarity.Uncommon },
-            new PotionTemplate { TemplateId = "rare_01", DisplayName = "Rare Base", Rarity = PotionRarity.Rare },
-            new PotionTemplate { TemplateId = "epic_01", DisplayName = "Epic Base", Rarity = PotionRarity.Epic },
-            new PotionTemplate { TemplateId = "legendary_01", DisplayName = "Legendary Base", Rarity = PotionRarity.Legendary }
-        };
     }
 }

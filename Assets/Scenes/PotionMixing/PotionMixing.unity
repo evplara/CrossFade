@@ -617,6 +617,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PotionBottleView
   bottleRenderer: {fileID: 0}
   labelText: {fileID: 0}
+  controller: {fileID: 0}
+  slotIndex: 0
+  hasPotion: 0
 --- !u!1 &306128746
 GameObject:
   m_ObjectHideFlags: 0
@@ -1105,6 +1108,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PotionBottleView
   bottleRenderer: {fileID: 0}
   labelText: {fileID: 0}
+  controller: {fileID: 0}
+  slotIndex: 0
+  hasPotion: 0
 --- !u!1 &1035549416
 GameObject:
   m_ObjectHideFlags: 0
@@ -1985,6 +1991,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PotionBottleView
   bottleRenderer: {fileID: 0}
   labelText: {fileID: 0}
+  controller: {fileID: 0}
+  slotIndex: 0
+  hasPotion: 0
 --- !u!1 &1701260083
 GameObject:
   m_ObjectHideFlags: 0
@@ -2525,6 +2534,7 @@ MonoBehaviour:
   - {fileID: 1628788835}
   - {fileID: 756714559}
   - {fileID: 206923348}
+  liquidStartScale: {x: 0, y: 0, z: 0}
 --- !u!4 &1916862663
 Transform:
   m_ObjectHideFlags: 0
