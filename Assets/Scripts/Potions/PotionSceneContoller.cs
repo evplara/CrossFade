@@ -402,7 +402,7 @@ public class PotionSceneController : MonoBehaviour
 
         if (liquidTransform != null)
         {
-            float fill = Mathf.Clamp(0.35f + (potion.GetMaxEffectValue() / 20f), 0.35f, 1.2f);
+            float fill = Mathf.Clamp(0.35f + (potion.GetMaxEffectValue() / PotionRules.GreenOutThreshold), 0.35f, 1.2f);
             liquidTransform.localScale = new Vector3(liquidStartScale.x, fill, liquidStartScale.z);
         }
     }
@@ -420,7 +420,7 @@ public class PotionSceneController : MonoBehaviour
 
     private Color BuildPotionColor(PotionData potion)
     {
-        const float colorNormalizeMax = 20f;
+        float colorNormalizeMax = PotionRules.GreenOutThreshold;
 
         float high = potion.GetEffectValue(EffectType.High) / colorNormalizeMax;
         float dizzy = potion.GetEffectValue(EffectType.Dizziness) / colorNormalizeMax;
