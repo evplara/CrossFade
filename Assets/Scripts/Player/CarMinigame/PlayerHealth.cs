@@ -62,12 +62,6 @@ public class PlayerHealth : MonoBehaviour
             HealthManager.Instance.TakeDamage(damagePerHit);
         }
 
-        // scene-local VFX
-        if (cameraShake != null)
-        {
-            cameraShake.StartShake(shakeDuration, shakeMagnitude);
-        }
-
         if (damageAudioSource != null && damageSound != null)
         {
             damageAudioSource.PlayOneShot(damageSound);
