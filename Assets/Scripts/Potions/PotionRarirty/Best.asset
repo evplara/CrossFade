@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3fee262b2ceaf04fa8419ea44d4cefe, type: 3}
   m_Name: Best
   m_EditorClassIdentifier: Assembly-CSharp::PotionRaritySO
+  effectRollMin: 20
+  effectRollMax: 40
   rarityValues:
   - rarity: 0
     value: 15
