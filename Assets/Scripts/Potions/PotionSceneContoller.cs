@@ -186,7 +186,10 @@ public class PotionSceneController : MonoBehaviour
             return;
         }
 
-        if (flowState != FlowState.CupMixedAwaitingCupClick && flowState != FlowState.CupArmedForDrink)
+        // Allow drinking after first pour (single potion in cup) OR after mixed cup.
+        if (flowState != FlowState.CupReadyForSecondPour
+            && flowState != FlowState.CupMixedAwaitingCupClick
+            && flowState != FlowState.CupArmedForDrink)
         {
             Debug.Log($"[PotionScene][CupClick-Blocked] invalid state for arming drink: {flowState}");
             return;

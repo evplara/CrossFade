@@ -2058,7 +2058,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HandleSceneManager
   miniGameSceneNames:
   - Interview2
-  - Careffects2
+  - CarEffects2
 --- !u!4 &1600190371
 Transform:
   m_ObjectHideFlags: 0
