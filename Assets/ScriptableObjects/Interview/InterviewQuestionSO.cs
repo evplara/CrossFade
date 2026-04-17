@@ -12,7 +12,5 @@ public class InterviewQuestionSO : ScriptableObject
 public class InterviewResponse
 {
     public string response;
-    [Header("0 being awful, 1 being perfect answer, 0.5 neutral")]
-    [Range(0, 1)]
-    public float score;
+    public int damage;
 }

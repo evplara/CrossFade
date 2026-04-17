@@ -12,17 +12,17 @@ public class PotionRollButtonUI : MonoBehaviour
 
     private void OnEnable()
     {
-        if (PlayerPotionStats.Instance != null)
+        if (MoneyManager.Instance != null)
         {
-            PlayerPotionStats.Instance.MoneyChanged += HandleButton;
+            MoneyManager.Instance.MoneyChanged += HandleButton;
         }
     }
 
     private void OnDisable()
     {
-        if (PlayerPotionStats.Instance != null)
+        if (MoneyManager.Instance != null)
         {
-            PlayerPotionStats.Instance.MoneyChanged -= HandleButton;
+            MoneyManager.Instance.MoneyChanged -= HandleButton;
         }
     }
 
@@ -38,7 +38,7 @@ public class PotionRollButtonUI : MonoBehaviour
 
     void HandleButton()
     {
-        if (costToBuy <= PlayerPotionStats.Instance.CurrentMoney)
+        if (costToBuy <= MoneyManager.Instance.CurrentMoney)
         {
             button.interactable = true;
         }else
@@ -50,6 +50,6 @@ public class PotionRollButtonUI : MonoBehaviour
     public void CallPotion()
     {
         PotionController.Instance.OnRollButtonClicked(rarityWeights);
-        PlayerPotionStats.Instance.ChangeMoney(-costToBuy);
+        MoneyManager.Instance.ChangeMoney(-costToBuy);
     }
 }

@@ -7,20 +7,23 @@ public class MoneyUI : MonoBehaviour
 
     private void OnEnable()
     {
-        if (PlayerPotionStats.Instance != null)
+        if (MoneyManager.Instance != null)
         {
-            PlayerPotionStats.Instance.MoneyChanged += UpdateMoney;
+            MoneyManager.Instance.MoneyChanged += UpdateMoney;
         }
     }
 
     private void OnDisable()
     {
-        PlayerPotionStats.Instance.MoneyChanged -= UpdateMoney;
+        if (MoneyManager.Instance != null)
+        {
+            MoneyManager.Instance.MoneyChanged -= UpdateMoney;
+        }
     }
 
     private void Awake()
     {
-        if (PlayerPotionStats.Instance != null)
+        if (MoneyManager.Instance != null)
         {
             UpdateMoney();
         }
@@ -28,6 +31,6 @@ public class MoneyUI : MonoBehaviour
 
     private void UpdateMoney()
     {
-        moneyText.text = PlayerPotionStats.Instance.CurrentMoney.ToString();
+        moneyText.text = MoneyManager.Instance.CurrentMoney.ToString();
     }
 }

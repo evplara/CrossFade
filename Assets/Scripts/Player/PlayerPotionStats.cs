@@ -19,14 +19,13 @@ public class PlayerPotionStats : MonoBehaviour
 {
     public static PlayerPotionStats Instance { get; private set; }
 
+    [SerializeField] private int maxEffectTotal = 100;
+    public int MaxEffectTotal => maxEffectTotal;
+
     // One slot per EffectType ordinal; sized from PotionRules.CoreEffects (same catalog as PotionData).
     private readonly float[] _totals = new float[PotionRules.CoreEffects.Length];
 
     public event Action StatsChanged;
-
-    private int currentMoney;
-    public int CurrentMoney => currentMoney;
-    public event Action MoneyChanged;
 
     private void Awake()
     {
@@ -92,13 +91,7 @@ public class PlayerPotionStats : MonoBehaviour
 
         _totals[idx] += delta;
 
-        if (_totals[idx] > 100) _totals[idx] = 100;
+        if (_totals[idx] > maxEffectTotal) _totals[idx] = maxEffectTotal;
     }
 
-    public void ChangeMoney(int money)
-    {
-        currentMoney += money;
-
-        MoneyChanged?.Invoke();
-    }
 }
