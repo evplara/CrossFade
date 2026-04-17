@@ -12009,7 +12009,7 @@ MonoBehaviour:
   - {fileID: 3863528447677258024, guid: b5fa35cdc8a3246e2802366c9eaea506, type: 3}
   laneDistance: 5
   spawnZ: 500
-  spawnInterval: 0.8
+  spawnInterval: 0.6
 --- !u!4 &1367266243
 Transform:
   m_ObjectHideFlags: 0

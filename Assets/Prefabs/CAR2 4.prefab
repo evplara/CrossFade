@@ -108,7 +108,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   minStartSpeed: 80
   maxStartSpeed: 140
-  maxSpeed: 600
+  maxSpeed: 900
   acceleration: 200
 --- !u!54 &3297234811555923348
 Rigidbody:
