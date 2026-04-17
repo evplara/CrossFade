@@ -1,149 +1,288 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using CrossFade.Potions;
 
 public class PotionSceneController : MonoBehaviour
 {
+    private enum FlowState
+    {
+        SelectBottleToPour,
+        CupReadyForSecondPour,
+        CupMixedAwaitingCupClick,
+        CupArmedForDrink
+    }
+
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI inventoryText;
     [SerializeField] private TextMeshProUGUI selectedPotionText;
-    [SerializeField] private TextMeshProUGUI debugText;
+    [SerializeField] private Button mixButton; // Acts as "Pour button" when cup is empty, "Mix button" when cup is full.
+    [SerializeField] private Button drinkButton; // Acts as "Drink button" when cup is full.
 
-    [Header("Cup Visual")]
+    [Header("Cup Visual")] // Visual representation of the cup's contents.
     [SerializeField] private SpriteRenderer liquidRenderer;
     [SerializeField] private Transform liquidTransform;
 
     [Header("Bottle Views")]
     [SerializeField] private PotionBottleView[] bottleViews;
 
-    [Header("Scene Transition")]
-    [SerializeField] private string nextSceneName = "PotionRoom2";
-    [SerializeField] private float resultDisplayTime = 2f;
-
-    [Header("Optional Custom Rarity Weights")]
-    [SerializeField] private PotionRaritySO rarityWeights;
-
     [Header("Inventory")]
     [SerializeField] private int maxSlots = 3;
 
-    private bool isTransitioning = false;
     private Vector3 liquidStartScale;
 
-    private PotionRoller roller;
-    private PotionMixer mixer;
-
-    private readonly List<PotionData> inventory = new();
+    private PotionController potionController;
+    private int selectedBottleIndex = -1;
+    private int cupPotionIndex = -1;
+    private FlowState flowState = FlowState.SelectBottleToPour;
+    private bool cupClickedToDrink;
 
     private void Start()
     {
         if (liquidTransform != null)
+        {
             liquidStartScale = liquidTransform.localScale;
+        }
 
-        roller = new PotionRoller();
-        mixer = new PotionMixer();
-
+        potionController = PotionController.Instance;
+        selectedBottleIndex = -1;
+        cupPotionIndex = -1;
+        flowState = FlowState.SelectBottleToPour;
+        cupClickedToDrink = false;
         RefreshScene();
+    }
+
+    // Every frame, refresh the buttons.
+    private void Update()
+    {
+        EnsureController();
+        RefreshButtons();
     }
 
     public void RollPotion()
     {
-        if (inventory.Count >= maxSlots)
-        {
-            debugText.text = "No free slot available.";
+        EnsureController();
+        if (potionController == null || potionController.Inventory.Count >= maxSlots)
             return;
-        }
 
-        PotionData newPotion = roller.RollPotion(rarityWeights);
-        inventory.Add(newPotion);
-
-        debugText.text = "Rolled a potion.";
+        potionController.OnRollButtonClicked();
+        flowState = cupPotionIndex >= 0 ? flowState : FlowState.SelectBottleToPour;
         RefreshScene();
     }
 
     public void MixPotion0And1()
     {
-        if (isTransitioning)
-            return;
-
-        if (inventory.Count < 2)
-        {
-            debugText.text = "Need at least 2 potions to mix.";
-            return;
-        }
-
-        StartCoroutine(MixThenTransition());
+        MixSelectedPotions();
     }
 
-    private IEnumerator MixThenTransition()
+    // Pour flow:
+    // 1) select bottle A -> pour (cup now has A)
+    // 2) select bottle B -> pour (cup mixes A+B)
+    public void MixSelectedPotions()
     {
-        isTransitioning = true;
+        EnsureController();
+        LogPourState("PourClicked-BeforeValidation");
+        if (potionController == null)
+            return;
 
-        PotionData mixedPotion = mixer.Mix(inventory[0], inventory[1]);
-        inventory[0] = mixedPotion;
-        inventory.RemoveAt(1);
+        if (selectedBottleIndex < 0 || selectedBottleIndex >= potionController.Inventory.Count)
+            return;
 
-        debugText.text = "Mixed potion created!";
-        RefreshScene();
+        if (flowState == FlowState.CupMixedAwaitingCupClick || flowState == FlowState.CupArmedForDrink)
+            return;
 
-        if (inventory.Count > 0)
+        // First pour: move selected bottle into cup state.
+        if (cupPotionIndex < 0)
         {
-            SelectPotion(0);
+            cupPotionIndex = selectedBottleIndex;
+            flowState = FlowState.CupReadyForSecondPour;
+            cupClickedToDrink = false;
+            selectedBottleIndex = -1; // Disable Pour until a new bottle is selected.
+            LogPourState("PourClicked-AfterFirstPour");
+            RefreshScene(); // Updates cup visual + text to poured bottle.
+            return;
         }
 
-        yield return new WaitForSeconds(resultDisplayTime);
+        // Second pour: mix selected bottle with cup contents.
+        if (selectedBottleIndex == cupPotionIndex)
+            return;
 
-        SceneManager.LoadScene(nextSceneName);
+        var left = Mathf.Min(cupPotionIndex, selectedBottleIndex);
+        var right = Mathf.Max(cupPotionIndex, selectedBottleIndex);
+        if (!potionController.TryMixByIndex(left, right))
+            return;
+
+        cupPotionIndex = Mathf.Min(left, potionController.Inventory.Count - 1);
+        flowState = FlowState.CupMixedAwaitingCupClick;
+        cupClickedToDrink = false;
+        selectedBottleIndex = -1;
+        LogPourState("PourClicked-AfterSecondPourMix");
+        RefreshScene();
     }
 
     public void ClearDisplay()
     {
         selectedPotionText.text = "No potion selected.";
-        debugText.text = "Display cleared.";
     }
 
     public void SelectPotion(int index)
     {
-        if (index < 0 || index >= inventory.Count)
+        EnsureController();
+        if (potionController == null || index < 0 || index >= potionController.Inventory.Count)
+            return;
+
+        var potion = potionController.Inventory[index];
+        selectedPotionText.text = FormatPotionDetails(potion);
+    }
+
+    public void OnBottleClicked(int index)
+    {
+        EnsureController();
+        if (potionController == null || index < 0 || index >= potionController.Inventory.Count)
+            return;
+
+        // Once cup already has the mixed result, force cup->drink flow.
+        if (flowState == FlowState.CupMixedAwaitingCupClick || flowState == FlowState.CupArmedForDrink)
+            return;
+
+        selectedBottleIndex = index;
+        flowState = cupPotionIndex >= 0 ? FlowState.CupReadyForSecondPour : FlowState.SelectBottleToPour;
+        cupClickedToDrink = false;
+        SelectPotion(index);
+        RefreshBottleViews();
+        RefreshButtons();
+    }
+
+    public void OnBottleHover(int index, bool isHovered)
+    {
+        EnsureController();
+        if (potionController == null)
+            return;
+
+        for (int i = 0; i < bottleViews.Length; i++)
         {
-            selectedPotionText.text = "No potion in this slot.";
+            if (bottleViews[i] == null)
+                continue;
+
+            var start = Mathf.Max(0, potionController.Inventory.Count - 3);
+            var inventoryIndex = start + i;
+            if (inventoryIndex != index)
+                continue;
+
+            var potion = inventoryIndex < potionController.Inventory.Count ? potionController.Inventory[inventoryIndex] : null;
+            bottleViews[i].SetHoverState(isHovered, potion != null ? BuildTooltipText(i, potion) : $"Bottle {i}: Empty");
+            break;
+        }
+    }
+
+    public void OnCupClicked()
+    {
+        EnsureController();
+        Debug.Log($"[PotionScene][CupClick-Before] flowState={flowState} cupPotionIndex={cupPotionIndex} cupClickedToDrink={cupClickedToDrink} controller={(potionController != null)}");
+        if (potionController == null || cupPotionIndex < 0 || cupPotionIndex >= potionController.Inventory.Count)
+        {
+            Debug.Log("[PotionScene][CupClick-Blocked] invalid controller or cup potion index.");
             return;
         }
 
-        var potion = inventory[index];
-        selectedPotionText.text = FormatPotionDetails(potion);
-        UpdateCupVisual(potion);
+        if (flowState != FlowState.CupMixedAwaitingCupClick && flowState != FlowState.CupArmedForDrink)
+        {
+            Debug.Log($"[PotionScene][CupClick-Blocked] invalid state for arming drink: {flowState}");
+            return;
+        }
+
+        flowState = FlowState.CupArmedForDrink;
+        cupClickedToDrink = true;
+        var cupPotion = potionController.Inventory[cupPotionIndex];
+        selectedPotionText.text = FormatPotionDetails(cupPotion);
+        UpdateCupVisual(cupPotion);
+        RefreshButtons();
+        LogPourState("CupClick-AfterArmDrink");
+    }
+
+    public void DrinkSelectedOrFirst()
+    {
+        DrinkFromCup();
+    }
+
+    public void DrinkFromCup()
+    {
+        EnsureController();
+        if (potionController == null || cupPotionIndex < 0 || cupPotionIndex >= potionController.Inventory.Count)
+            return;
+
+        if (flowState != FlowState.CupArmedForDrink)
+            return;
+
+        if (!potionController.OnConsumeButtonClicked(cupPotionIndex))
+            return;
+
+        selectedBottleIndex = -1;
+        cupPotionIndex = -1;
+        flowState = FlowState.SelectBottleToPour;
+        cupClickedToDrink = false;
+        RefreshScene();
     }
 
     private void RefreshScene()
     {
+        EnsureController();
+        if (potionController == null)
+        {
+            ResetCupVisual();
+            RefreshButtons();
+            return;
+        }
+
+        if (selectedBottleIndex < 0 || selectedBottleIndex >= potionController.Inventory.Count)
+        {
+            selectedBottleIndex = -1;
+        }
+
+        if (cupPotionIndex < 0 || cupPotionIndex >= potionController.Inventory.Count)
+        {
+            cupPotionIndex = -1;
+            flowState = FlowState.SelectBottleToPour;
+            cupClickedToDrink = false;
+        }
+
         RefreshInventoryText();
         RefreshBottleViews();
+        RefreshButtons();
 
-        if (inventory.Count > 0)
-            SelectPotion(0);
+        if (cupPotionIndex >= 0 && cupPotionIndex < potionController.Inventory.Count)
+        {
+            var cupPotion = potionController.Inventory[cupPotionIndex];
+            selectedPotionText.text = FormatPotionDetails(cupPotion);
+            UpdateCupVisual(cupPotion);
+        }
         else
+        {
             ResetCupVisual();
+        }
     }
 
     private void RefreshInventoryText()
     {
+        if (potionController == null)
+            return;
+
         var sb = new StringBuilder();
         sb.AppendLine("Inventory");
 
-        if (inventory.Count == 0)
+        if (potionController.Inventory.Count == 0)
         {
             sb.AppendLine("(empty)");
         }
         else
         {
-            for (int i = 0; i < inventory.Count; i++)
+            var start = Mathf.Max(0, potionController.Inventory.Count - 3);
+            var viewIndex = 0;
+            for (int i = start; i < potionController.Inventory.Count && viewIndex < 3; i++, viewIndex++)
             {
-                var potion = inventory[i];
-                sb.AppendLine($"{i}: {potion.Name} [{potion.Rarity}]");
+                var potion = potionController.Inventory[i];
+                sb.AppendLine($"Bottle {viewIndex}: {potion.Name} [{potion.Rarity}]");
             }
         }
 
@@ -152,17 +291,85 @@ public class PotionSceneController : MonoBehaviour
 
     private void RefreshBottleViews()
     {
+        if (potionController == null)
+            return;
+
+        var inventory = potionController.Inventory;
+        var start = Mathf.Max(0, inventory.Count - 3);
         for (int i = 0; i < bottleViews.Length; i++)
         {
-            if (i < inventory.Count)
+            if (bottleViews[i] == null)
+                continue;
+
+            var inventoryIndex = start + i;
+            if (inventoryIndex < inventory.Count)
             {
-                bottleViews[i].SetPotion(this, i, inventory[i]);
+                var potion = inventory[inventoryIndex];
+                bottleViews[i].SetPotion(this, inventoryIndex, potion, selectedBottleIndex == inventoryIndex, BuildTooltipText(i, potion));
             }
             else
             {
                 bottleViews[i].ClearPotion(this, i);
             }
         }
+    }
+
+    private string BuildTooltipText(int bottleIndex, PotionData potion)
+    {
+        return $"Bottle {bottleIndex}: {potion.Name}\n{potion.Rarity}";
+    }
+
+    private void RefreshButtons()
+    {
+        EnsureController();
+        var canPour = potionController != null
+                      && selectedBottleIndex >= 0
+                      && flowState != FlowState.CupMixedAwaitingCupClick
+                      && flowState != FlowState.CupArmedForDrink
+                      && (cupPotionIndex < 0 || selectedBottleIndex != cupPotionIndex);
+        var canDrink = potionController != null
+                       && flowState == FlowState.CupArmedForDrink
+                       && cupPotionIndex >= 0
+                       && cupPotionIndex < potionController.Inventory.Count
+                       && cupClickedToDrink;
+
+        if (mixButton != null)
+        {
+            mixButton.interactable = canPour;
+        }
+
+        if (drinkButton != null)
+        {
+            drinkButton.interactable = canDrink;
+        }
+    }
+
+    private void EnsureController()
+    {
+        if (potionController == null)
+        {
+            potionController = PotionController.Instance;
+        }
+    }
+
+    private void LogPourState(string stage)
+    {
+        var inventoryCount = potionController != null ? potionController.Inventory.Count : -1;
+        var canPour = potionController != null
+                      && selectedBottleIndex >= 0
+                      && flowState != FlowState.CupMixedAwaitingCupClick
+                      && flowState != FlowState.CupArmedForDrink
+                      && (cupPotionIndex < 0 || selectedBottleIndex != cupPotionIndex);
+        var canDrink = potionController != null
+                       && flowState == FlowState.CupArmedForDrink
+                       && cupPotionIndex >= 0
+                       && cupPotionIndex < inventoryCount
+                       && cupClickedToDrink;
+
+        Debug.Log(
+            $"[PotionScene][{stage}] " +
+            $"flowState={flowState} | selectedBottleIndex={selectedBottleIndex} | cupPotionIndex={cupPotionIndex} | " +
+            $"cupClickedToDrink={cupClickedToDrink} | inventoryCount={inventoryCount} | canPour={canPour} | canDrink={canDrink}");
     }
 
     private string FormatPotionDetails(PotionData potion)
