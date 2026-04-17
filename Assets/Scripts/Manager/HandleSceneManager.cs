@@ -36,7 +36,7 @@ public class HandleSceneManager : MonoBehaviour
     //should change this later...
     public void LoadPotionScene()
     {
-        LoadScene("PotionRoom2");
+        LoadScene("SlotMachine");
     }
 
     public void LoadScene(string sceneName)
