@@ -41,6 +41,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SlotMachine.unity
     guid: 3997cff954e844edd8008352ac853930
+  - enabled: 1
+    path: Assets/Scenes/PotionMixing.unity
+    guid: 6f01cd71a836fec48a5b25478901e200
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

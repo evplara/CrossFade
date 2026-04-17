@@ -22,6 +22,8 @@ public static class PotionEffectVfxHooks
             float value = stats.GetTotal(effectType);
             ApplySingle(effectType, value);
         }
+
+        EffectsManager.instance?.SyncVignetteFromStats(stats);
     }
 
     // One effect type per call. ApplyAllFromPlayerStats loops all CoreEffects, so multiple types (High + Dizziness + …) all run when totals are > 0 — the switch only routes this invocation, it does not mean “one effect globally.”
@@ -60,7 +62,6 @@ public static class PotionEffectVfxHooks
                 break;
 
             case EffectType.Nausea:
-                EffectsManager.instance.ActiveNausea(value);
                 Debug.Log("Nausea value: " + value);
                 break;
 

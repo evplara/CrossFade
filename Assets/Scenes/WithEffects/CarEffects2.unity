@@ -5628,10 +5628,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Nausea: 15'
+  m_text: 'Nausea: ?'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
+  m_sharedMaterial: {fileID: 4275271339899573138, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6513,6 +6513,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 974194368742900384, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
+    - target: {fileID: 974194368742900384, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 4275271339899573138, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
+    - target: {fileID: 974194368742900384, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1420331598525565382, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -6593,9 +6605,69 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1752084528813290298, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
+    - target: {fileID: 1752084528813290298, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 4275271339899573138, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
+    - target: {fileID: 1752084528813290298, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2969058788677775796, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
       propertyPath: m_Name
       value: TimerCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 6270974917082613725, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
+    - target: {fileID: 6270974917082613725, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 4275271339899573138, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
+    - target: {fileID: 6270974917082613725, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6300028023174849214, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
+    - target: {fileID: 6300028023174849214, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 4275271339899573138, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
+    - target: {fileID: 6300028023174849214, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8049528352549318939, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
+    - target: {fileID: 8049528352549318939, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 4275271339899573138, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
+    - target: {fileID: 8049528352549318939, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8917393030878482631, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
+    - target: {fileID: 8917393030878482631, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 4275271339899573138, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
+    - target: {fileID: 8917393030878482631, guid: e84abe8c114d8f54798b766bbf8bf82c, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11717,8 +11789,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'MPH: 90'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
+  m_sharedMaterial: {fileID: 4275271339899573138, guid: 147f239e008df4ba8ae1c701ac6970aa, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -11937,7 +12009,7 @@ MonoBehaviour:
   - {fileID: 3863528447677258024, guid: b5fa35cdc8a3246e2802366c9eaea506, type: 3}
   laneDistance: 5
   spawnZ: 500
-  spawnInterval: 0.8
+  spawnInterval: 0.6
 --- !u!4 &1367266243
 Transform:
   m_ObjectHideFlags: 0
@@ -12088,7 +12160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad0c59bbc12eb478ab208365b8cc44e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  maxHealth: 3
+  damagePerHit: 1
   cameraShake: {fileID: 519420033}
   shakeDuration: 0.4
   shakeMagnitude: 0.7

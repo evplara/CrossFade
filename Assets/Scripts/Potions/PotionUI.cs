@@ -45,45 +45,6 @@ namespace CrossFade.Potions
             Select(slotIndex);
         }
 
-        /*
-         * Selection-based mix (restore when shelf UI exists):
-         *
-         * public void OnMixButtonClicked()
-         * {
-         *     var inv = Inventory;
-         *     if (inv.Count < 2)
-         *     {
-         *         Debug.Log("Mix failed: need at least two potions.");
-         *         return;
-         *     }
-         *
-         *     var lastRolledIndex = inv.Count - 1;
-         *     if (SelectedIndex < 0)
-         *     {
-         *         Debug.Log("Mix failed: select a shelf potion to mix with the current roll.");
-         *         return;
-         *     }
-         *
-         *     if (SelectedIndex == lastRolledIndex)
-         *     {
-         *         Debug.Log("Mix failed: pick a different slot than the current roll.");
-         *         return;
-         *     }
-         *
-         *     if (!TryMixByIndex(SelectedIndex, lastRolledIndex))
-         *     {
-         *         Debug.Log("Mix failed.");
-         *         return;
-         *     }
-         *
-         *     var mixed = GetAt(SelectedIndex);
-         *     if (mixed != null)
-         *     {
-         *         Debug.Log($"Mixed potion: {mixed.Name} | Rarity: {mixed.Rarity}");
-         *     }
-         * }
-         */
-
         // Testing: no shelf selection — mixes newest roll with last mix output when that potion is still on shelf; otherwise last two entries.
         public void OnMixButtonClicked()
         {
@@ -106,27 +67,24 @@ namespace CrossFade.Potions
             }
         }
 
-        /*
-         * Selection-based consume (restore when shelf slot UI exists):
-         *
-         * public void OnConsumeButtonClicked()
-         * {
-         *     if (SelectedIndex < 0)
-         *     {
-         *         Debug.Log("Consume failed: no potion selected.");
-         *         return;
-         *     }
-         *
-         *     var consumed = ConsumePotionAt(SelectedIndex);
-         *     if (consumed == null)
-         *     {
-         *         Debug.Log("Consume failed.");
-         *         return;
-         *     }
-         *
-         *     Debug.Log($"Consumed potion: {consumed.Name} | Rarity: {consumed.Rarity}");
-         * }
-         */
+        // Scene UI path: explicitly mix two selected inventory indices.
+        public bool OnMixButtonClicked(int leftIndex, int rightIndex)
+        {
+            Debug.Log($"[PotionUI] OnMixButtonClicked(left,right) called | left={leftIndex} right={rightIndex} inventoryCount={Inventory.Count}");
+            if (!TryMixByIndex(leftIndex, rightIndex))
+            {
+                Debug.Log("Mix failed.");
+                return false;
+            }
+
+            var mixed = GetAt(Mathf.Min(leftIndex, rightIndex));
+            if (mixed != null)
+            {
+                Debug.Log($"Mixed potion: {mixed.Name} | Rarity: {mixed.Rarity}\n{mixed.FormatEffectsForDebug()}");
+            }
+
+            return true;
+        }
 
         // Testing: drink the last potion on the shelf (no slot selection). Applies stats via ConsumePotionAt → PlayerPotionStats.
         public void OnConsumeButtonClicked()
@@ -147,6 +105,28 @@ namespace CrossFade.Potions
             }
 
             LogSimulatedDrinkEffects(consumed);
+        }
+
+        // Scene UI path: consume a specific potion index (e.g., cup-selected potion).
+        public bool OnConsumeButtonClicked(int index)
+        {
+            var inv = Inventory;
+            Debug.Log($"[PotionUI] OnConsumeButtonClicked(index) called | index={index} inventoryCount={inv.Count}");
+            if (index < 0 || index >= inv.Count)
+            {
+                Debug.Log("Drink failed: invalid index.");
+                return false;
+            }
+
+            var consumed = ConsumePotionAt(index);
+            if (consumed == null)
+            {
+                Debug.Log("Drink failed.");
+                return false;
+            }
+
+            LogSimulatedDrinkEffects(consumed);
+            return true;
         }
 
         private static void LogSimulatedDrinkEffects(PotionData potion)

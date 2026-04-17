@@ -5,14 +5,6 @@ public class MoneyUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI moneyText;
 
-    private void OnEnable()
-    {
-        if (MoneyManager.Instance != null)
-        {
-            MoneyManager.Instance.MoneyChanged += UpdateMoney;
-        }
-    }
-
     private void OnDisable()
     {
         if (MoneyManager.Instance != null)
@@ -21,8 +13,13 @@ public class MoneyUI : MonoBehaviour
         }
     }
 
-    private void Awake()
+    private void Start()
     {
+        if (MoneyManager.Instance != null)
+        {
+            MoneyManager.Instance.MoneyChanged += UpdateMoney;
+        }
+
         if (MoneyManager.Instance != null)
         {
             UpdateMoney();
