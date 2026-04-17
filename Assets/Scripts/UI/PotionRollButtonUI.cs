@@ -9,6 +9,7 @@ public class PotionRollButtonUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI moneyLabel;
     [SerializeField] private int costToBuy;
     [SerializeField] private PotionRaritySO rarityWeights;
+    [SerializeField] private PotionRollButton rollButton;
 
     private void OnEnable()
     {
@@ -49,7 +50,7 @@ public class PotionRollButtonUI : MonoBehaviour
 
     public void CallPotion()
     {
-        PotionController.Instance.OnRollButtonClicked(rarityWeights);
+        rollButton.SetWeights(rarityWeights);
         MoneyManager.Instance.ChangeMoney(-costToBuy);
     }
 }
