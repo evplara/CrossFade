@@ -10,7 +10,7 @@ using System.Collections.Generic;
  *
  * Main APIs / usage:
  *   - Minigame flow calls these with the active consumed / round potion; not used by inventory code.
- *   - ResolveReductionFromIntensity: private tiered reduction from highest effect value.
+ *   - ResolveReductionFromIntensity: tiered reduction from highest effect value (breakpoints scale with GreenOutThreshold vs legacy 1–16 scale).
  */
 
 namespace CrossFade.Potions
@@ -104,17 +104,18 @@ namespace CrossFade.Potions
 
         private static float ResolveReductionFromIntensity(float maxEffect)
         {
-            if (maxEffect >= 14f)
+            var scale = PotionRules.GreenOutThreshold / 16f;
+            if (maxEffect >= 14f * scale)
             {
                 return 9f;
             }
 
-            if (maxEffect >= 10f)
+            if (maxEffect >= 10f * scale)
             {
                 return 6f;
             }
 
-            if (maxEffect >= 7f)
+            if (maxEffect >= 7f * scale)
             {
                 return 3f;
             }

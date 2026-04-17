@@ -46,7 +46,7 @@ namespace CrossFade.Potions
     {
         public const int MinRollValue = 1;
         public const int MaxRollValue = 10;
-        public const int GreenOutThreshold = 16;
+        public const int GreenOutThreshold = 75;
 
         public static readonly EffectType[] CoreEffects =
         {
