@@ -20,7 +20,7 @@ using UnityEngine;
  *   The manager handles everything else — events, clamping, death.
  */
 
-public class HealthManager : MonoBehaviour
+public class HealthManager : MonoBehaviour, IResetable
 {
     public static HealthManager Instance { get; private set; }
 
@@ -83,5 +83,10 @@ public class HealthManager : MonoBehaviour
     {
         currentHealth = maxHealth;
         HealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
+    public void OnReset()
+    {
+        ResetHealth();
     }
 }

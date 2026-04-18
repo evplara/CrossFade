@@ -527,7 +527,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 323e3546efc2e4831ac8c672bd9ad3c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthManager
-  maxHealth: 10
+  maxHealth: 15
 --- !u!4 &373399406
 Transform:
   m_ObjectHideFlags: 0
@@ -1257,6 +1257,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25c3bf356add845549a64f9094972bfd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MoneyManager
+  startingMoney: 300
 --- !u!4 &908468130
 Transform:
   m_ObjectHideFlags: 0

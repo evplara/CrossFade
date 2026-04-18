@@ -66,6 +66,11 @@ public class HandleSceneManager : MonoBehaviour
         }
     }
 
+    public void LoadGameOverScene()
+    {
+        LoadScene("GameOverScreen");
+    }
+
     public void LoadPotionScene()
     {
         LoadScene("SlotMachine");

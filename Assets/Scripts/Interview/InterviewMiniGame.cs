@@ -23,10 +23,27 @@ public class InterviewMiniGame : MonoBehaviour
     private bool active;
     private float score;
 
+    private void OnDisable()
+    {
+        if (SessionTimer.Instance != null)
+        {
+            SessionTimer.Instance.SessionOver -= HandleSessionOver;
+        }
+    }
+
     private void Start()
     {
+        SessionTimer.Instance.SessionOver += HandleSessionOver;
         ApplyPotionContextFromSession();
+
+
         StartMiniGame();
+    }
+
+    //take damage if minigame swap, but not when session is over
+    void HandleSessionOver()
+    {
+        active = false;
     }
 
     // Reads <see cref="PlayerPotionStats"/> (persists via DontDestroyOnLoad on that component's GameObject) and applies VFX hooks + minigame tuning.
@@ -159,6 +176,11 @@ public class InterviewMiniGame : MonoBehaviour
 
         int damage = response != null ? response.damage : 1;
         HealthManager.Instance.TakeDamage(damage);
+
+        if (damage == 0 && response != null)
+        {
+            SessionManager.Instance.InterviewMoney(response.moneyEarned);
+        }
 
         timeText.text = "";
         currentIndex++;
