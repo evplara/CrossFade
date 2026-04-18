@@ -13,4 +13,5 @@ public class InterviewResponse
 {
     public string response;
     public int damage;
+    public int moneyEarned;
 }

@@ -16,7 +16,10 @@ MonoBehaviour:
   responses:
   - response: Headbutt them and yell in their face.
     damage: 1
+    moneyEarned: 0
   - response: Leave the area.
     damage: 0
+    moneyEarned: 50
   - response: Get manager.
     damage: 0
+    moneyEarned: 100
