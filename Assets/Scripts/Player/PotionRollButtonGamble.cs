@@ -2,6 +2,8 @@ using UnityEngine;
 using TMPro;
 using CrossFade.Potions;
 using System.Text;
+using System.Collections.Generic;
+using UnityEngine.Rendering;
 
 public class PotionRollButton : MonoBehaviour
 {
@@ -9,8 +11,21 @@ public class PotionRollButton : MonoBehaviour
     public TMP_Text potionNameText;
     public TMP_Text potionStatsText;
 
+    [SerializeField] private List<PotionRaritySO> weights = new();
+    [SerializeField] private List<GameObject> weightsButtons;
+    private PotionRaritySO currenWeight;
+
+    private void Start()
+    {
+        currenWeight = weights[0];
+    }
+
     public void OnRollButtonPressed()
     {
+        foreach(GameObject g in weightsButtons)
+        {
+            g.SetActive(false);
+        }
         var controller = PotionController.Instance;
         if (controller == null)
         {
@@ -18,7 +33,7 @@ public class PotionRollButton : MonoBehaviour
             return;
         }
 
-        if (!controller.TryRollAndStorePotion())
+        if (!controller.TryRollAndStorePotion(currenWeight))
         {
             Debug.LogWarning("Failed to roll potion (inventory full or not ready)");
             return;
@@ -77,5 +92,10 @@ public class PotionRollButton : MonoBehaviour
             < 0 => $"{value:0}",
             _ => "0"
         };
+    }
+
+    public void SetWeights(PotionRaritySO rarity)
+    {
+        currenWeight = rarity;
     }
 }

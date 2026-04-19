@@ -6,7 +6,7 @@ using System.Collections.Generic;
  *
  * What lives here:
  *   - Weighted rarity roll, then Name / Affix / Suffix from PotionNaming (Resources JSON).
- *   - One rolled value per PotionRules.CoreEffects (range PotionRules.MinRollValue–MaxRollValue).
+ *   - One rolled value per PotionRules.CoreEffects (inclusive range from PotionRaritySO → PotionData.EffectRollMin/Max).
  *
  * Main APIs / usage:
  *   - RollPotion / BuildRolledPotion: called from PotionController.TryRollAndStorePotion.
@@ -47,12 +47,13 @@ namespace CrossFade.Potions
             }
         }
 
-        // Rolls a complete potion instance (rarity, display name from JSON affix/suffix, core effects 1–10).
+        // Rolls a complete potion instance (rarity, display name from JSON affix/suffix, core effects in roll range).
         public PotionData RollPotion(PotionRaritySO weights = null)
         {
-
             var rarity = weights != null ? RollCustomRarity(weights) : RollRarity();
-            return BuildRolledPotion(rarity);
+            var rollMin = weights != null ? weights.effectRollMin : PotionRules.MinRollValue;
+            var rollMax = weights != null ? weights.effectRollMax : PotionRules.MaxRollValue;
+            return BuildRolledPotion(rarity, rollMin, rollMax);
         }
 
         // Rolls a rarity tier based on configured weights.
@@ -139,8 +140,8 @@ namespace CrossFade.Potions
 
         // Creates a runtime potion instance for a rolled rarity.
         // Name = random affix + random suffix from JSON (display name).
-        // Every core effect is procedurally rolled from 1..10.
-        public PotionData BuildRolledPotion(PotionRarity rarity)
+        // Core effect values roll inclusively between effectRollMin and effectRollMax (stored on the potion).
+        public PotionData BuildRolledPotion(PotionRarity rarity, int effectRollMin, int effectRollMax)
         {
             var affix = PotionNaming.PickRandomAffix(_namingData);
             var suffix = PotionNaming.PickRandomSuffix(_namingData);
@@ -149,14 +150,16 @@ namespace CrossFade.Potions
                 Affix = affix,
                 Suffix = suffix,
                 Name = $"{affix} {suffix}",
-                Rarity = rarity
+                Rarity = rarity,
+                EffectRollMin = effectRollMin,
+                EffectRollMax = effectRollMax
             };
 
             var effectTypes = PotionRules.CoreEffects;
             for (var i = 0; i < effectTypes.Length; i++)
             {
                 var effectType = effectTypes[i];
-                var rolledValue = RollCoreEffectValue();
+                var rolledValue = RollCoreEffectValue(effectRollMin, effectRollMax);
                 potion.Effects.Add(new PotionEffectValue(effectType, rolledValue));
             }
 
@@ -185,9 +188,14 @@ namespace CrossFade.Potions
             }
         }
 
-        private static float RollCoreEffectValue()
+        private static float RollCoreEffectValue(int min, int max)
         {
-            return UnityEngine.Random.Range(PotionRules.MinRollValue, PotionRules.MaxRollValue + 1);
+            if (max < min)
+            {
+                (min, max) = (max, min);
+            }
+
+            return UnityEngine.Random.Range(min, max + 1);
         }
     }
 }

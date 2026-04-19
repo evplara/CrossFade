@@ -16,7 +16,10 @@ MonoBehaviour:
   responses:
   - response: Youtube
     damage: 1
+    moneyEarned: 0
   - response: NYC Live Streams
     damage: 1
+    moneyEarned: 0
   - response: 'Hollow Knight: Silksong'
     damage: 0
+    moneyEarned: 25

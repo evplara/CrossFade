@@ -13,30 +13,67 @@ public class HandleSceneManager : MonoBehaviour
     [SerializeField] private string[] miniGameSceneNames;
     private string currentSceneName;
 
+    // Prevent stale singleton references when Enter Play Mode Options disables domain reload.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticStateOnPlay()
+    {
+        instance = null;
+    }
+
     private void Awake()
     {
         if (instance != null && instance != this)
         {
-            Destroy(gameObject);
+            var oldInstance = instance;
+            if ((miniGameSceneNames == null || miniGameSceneNames.Length == 0)
+                && oldInstance.miniGameSceneNames != null
+                && oldInstance.miniGameSceneNames.Length > 0)
+            {
+                miniGameSceneNames = oldInstance.miniGameSceneNames;
+            }
+
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+            if (oldInstance != null)
+            {
+                Destroy(oldInstance.gameObject);
+            }
+
             return;
         }
 
         instance = this;
         DontDestroyOnLoad(gameObject);
+        currentSceneName = SceneManager.GetActiveScene().name;
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.activeSceneChanged += HandleActiveSceneChanged;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.activeSceneChanged -= HandleActiveSceneChanged;
     }
 
     private void OnDestroy()
     {
+        SceneManager.activeSceneChanged -= HandleActiveSceneChanged;
         if (instance == this)
         {
             instance = null;
         }
     }
 
-    //should change this later...
+    public void LoadGameOverScene()
+    {
+        LoadScene("GameOverScreen");
+    }
+
     public void LoadPotionScene()
     {
-        LoadScene("PotionRoom2");
+        LoadScene("SlotMachine");
     }
 
     public void LoadScene(string sceneName)
@@ -53,6 +90,7 @@ public class HandleSceneManager : MonoBehaviour
 
     public void LoadRandomMiniGameScene()
     {
+        currentSceneName = SceneManager.GetActiveScene().name;
         if (miniGameSceneNames == null || miniGameSceneNames.Length == 0)
         {
             //default backup
@@ -73,6 +111,11 @@ public class HandleSceneManager : MonoBehaviour
         string targetScene = filterScenes[random];
 
         LoadScene(targetScene);
+    }
+
+    private void HandleActiveSceneChanged(Scene previous, Scene next)
+    {
+        currentSceneName = next.name;
     }
 
 

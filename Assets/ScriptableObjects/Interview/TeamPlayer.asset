@@ -16,7 +16,10 @@ MonoBehaviour:
   responses:
   - response: Yes
     damage: 0
+    moneyEarned: 50
   - response: Kobe didn't need teammates.
     damage: 1
+    moneyEarned: 0
   - response: Love my teammates.
     damage: 0
+    moneyEarned: 50

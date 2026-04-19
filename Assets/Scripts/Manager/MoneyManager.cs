@@ -13,11 +13,11 @@ using UnityEngine;
  *   - ResetMoney() when starting a fresh run.
  */
 
-public class MoneyManager : MonoBehaviour
+public class MoneyManager : MonoBehaviour, IResetable
 {
     public static MoneyManager Instance { get; private set; }
-
-    private int currentMoney = 300;
+    [SerializeField] private int startingMoney = 300;
+    private int currentMoney;
 
     public int CurrentMoney => currentMoney;
 
@@ -33,6 +33,7 @@ public class MoneyManager : MonoBehaviour
         }
 
         Instance = this;
+        currentMoney = startingMoney;
         DontDestroyOnLoad(gameObject);
     }
 
@@ -57,5 +58,10 @@ public class MoneyManager : MonoBehaviour
     {
         currentMoney = 0;
         MoneyChanged?.Invoke();
+    }
+
+    public void OnReset()
+    {
+        currentMoney = startingMoney;
     }
 }

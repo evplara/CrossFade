@@ -7,9 +7,9 @@ using System.Collections.Generic;
  * What lives here:
  *   - PotionRarity: tier enum for weighted rolls and display.
  *   - EffectType: all six gameplay effects (High, Dizziness, Nausea, Hallucination, Lethargy, Focus).
- *   - PotionRules: shared constants (roll 1–10, green-out threshold, ordered CoreEffects list).
+ *   - PotionRules: shared constants (default roll span, green-out threshold, ordered CoreEffects list).
  *   - PotionEffectValue: one effect type + numeric value on an instance.
- *   - PotionData: runtime potion (Name, Affix, Suffix, Rarity, Effects, consumed flag). Rolled names are
+ *   - PotionData: runtime potion (Name, Affix, Suffix, Rarity, EffectRollMin/Max used when rolled, Effects, consumed). Rolled names are
  *     "Affix Suffix"; mixed names are "Affix + Suffix" from left/right parts (see PotionMixer).
  *
  * Main APIs / usage:
@@ -46,7 +46,7 @@ namespace CrossFade.Potions
     {
         public const int MinRollValue = 1;
         public const int MaxRollValue = 10;
-        public const int GreenOutThreshold = 16;
+        public const int GreenOutThreshold = 75;
 
         public static readonly EffectType[] CoreEffects =
         {
@@ -94,6 +94,8 @@ namespace CrossFade.Potions
         public string Affix = string.Empty;
         public string Suffix = string.Empty;
         public PotionRarity Rarity = PotionRarity.Common;
+        public int EffectRollMin = PotionRules.MinRollValue;
+        public int EffectRollMax = PotionRules.MaxRollValue;
         public List<PotionEffectValue> Effects = new();
         public bool IsConsumed;
 
