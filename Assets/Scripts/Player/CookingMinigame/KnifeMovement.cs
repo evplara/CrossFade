@@ -8,10 +8,14 @@ public class KnifeMovement : MonoBehaviour
     // General variables
 
     [SerializeField] public float speed = 10f;
-    [SerializeField] public float acceletation = 5f; 
+    [SerializeField] public float ascceletation = 5f; 
+    private Vector3 resetPosition;
+
+    private bool isColliding = false;
     
     public float sliceDelay = 1;
     private bool sliceIsExecuting = false;
+    private bool knifeIsResetting = false;
 
     // Knife variables
 
@@ -29,6 +33,7 @@ public class KnifeMovement : MonoBehaviour
     {
         rigidBody = GetComponent<Rigidbody>();
         boxCollider = blade.GetComponent<BoxCollider>();
+        resetPosition = transform.position;
 
         direction = new Vector3(0, 0, 1).normalized;
     }
@@ -38,7 +43,7 @@ public class KnifeMovement : MonoBehaviour
     {
         Mouse mouse = Mouse.current;
 
-        if (mouse.leftButton.wasPressedThisFrame && !sliceIsExecuting)
+        if (mouse.leftButton.wasPressedThisFrame && !sliceIsExecuting && !knifeIsResetting)
         {
             StartCoroutine(Slice());
         }
@@ -51,6 +56,12 @@ public class KnifeMovement : MonoBehaviour
             Vector3 newPosition = rigidBody.position + direction * (speed * Time.fixedDeltaTime);
             rigidBody.MovePosition(newPosition);
         }
+        else if (knifeIsResetting)
+        {
+            Vector3 newPosition = rigidBody.position - direction * (speed * Time.fixedDeltaTime);
+            rigidBody.MovePosition(newPosition);
+        }
+
     }
 
     IEnumerator Slice()
@@ -59,21 +70,47 @@ public class KnifeMovement : MonoBehaviour
 
         yield return new WaitUntil(IsColliding);
 
-        Debug.Log("Yes!");
+        Debug.Log("Slice!");
 
         sliceIsExecuting = false;
+        isColliding = false;
+
+        StartCoroutine(ResetKnife());
+    }
+
+    IEnumerator ResetKnife()
+    {
+        knifeIsResetting = true;
+
+        yield return new WaitUntil(KnifeReset);
+
+        Debug.Log("Knife reset!");
+
+        knifeIsResetting = false;
     }
 
     bool IsColliding()
     {
-        return true;
+        return isColliding;
+    }
+
+    bool KnifeReset()
+    {
+        return transform.position == resetPosition;
     }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Plane"))
         {
+            isColliding = true;
             Debug.Log("Slice missed!");
+        }
+
+        if (other.CompareTag("Enemy"))
+        {
+            isColliding = true;
+            Debug.Log("Slice hit!");
         }
     }
 }
