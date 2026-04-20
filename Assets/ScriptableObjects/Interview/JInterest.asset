@@ -16,7 +16,10 @@ MonoBehaviour:
   responses:
   - response: The money.
     damage: 1
+    moneyEarned: 0
   - response: This is a prestigious company.
     damage: 0
+    moneyEarned: 100
   - response: I heard it's easy here.
     damage: 1
+    moneyEarned: 0

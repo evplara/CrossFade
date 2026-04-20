@@ -118,11 +118,6 @@ public class PlayerMovement : MonoBehaviour
     // Tilt opposite direction for natural feel
     targetZRotation = -direction * tiltAngle;
 
-    if (cameraShake != null)
-    {
-        cameraShake.StartShake(shakeDuration, shakeMagnitude);
-    }
-
     if (audioSource != null && turnSound != null)
     {
         audioSource.pitch = Random.Range(minPitch, maxPitch);

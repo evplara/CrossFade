@@ -16,7 +16,10 @@ MonoBehaviour:
   responses:
   - response: On time.
     damage: 0
+    moneyEarned: 50
   - response: 10 minutes early.
     damage: 0
+    moneyEarned: 100
   - response: Depends on how I'm feeling.
     damage: 1
+    moneyEarned: 0

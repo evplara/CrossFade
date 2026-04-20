@@ -35,7 +35,6 @@ public class StartMiniGameUI : MonoBehaviour
         SessionTimer.Instance.SetTime(roundValue);
         MinigameTimer.Instance.SetTime(gameValue);
 
-        HealthManager.Instance.ResetHealth();
         SessionTimer.Instance.StartSession();
         HandleSceneManager.instance.LoadRandomMiniGameScene();
     }
